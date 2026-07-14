@@ -238,6 +238,7 @@ Growing your audience, one authentic interaction at a time.
 | 🤖 [Agentic Search Optimizer](marketing/marketing-agentic-search-optimizer.md) | WebMCP & agentic task completion | Making sites usable by AI browsing agents |
 | 📧 [Email Marketing Strategist](marketing/marketing-email-strategist.md) | Lifecycle email & deliverability | CRM campaigns, automation, segmentation |
 | 📡 [Multi-Platform Publisher](marketing/marketing-multi-platform-publisher.md) | One-click Chinese multi-platform publishing | Routing one article to 知乎/小红书/CSDN/B站/公众号/掘金 |
+| 🎞️ [HyperFrames Video Editor](marketing/marketing-hyperframes-video-editor.md) | Prompt-driven HyperFrames editing, voice-synced captions, SNS clips | Turning long recordings into ready-to-post vertical SNS clips |
 | 📣 [PR & Communications Manager](marketing/marketing-pr-communications-manager.md) | PR, media relations & crisis comms | Press releases, thought leadership, reputation |
 
 ### 📊 Product Division
