@@ -295,29 +295,34 @@ function statCard(slide, x, y, w, h, big, label, sub, accent) {
 {
   const s = pres.addSlide();
   titleSlide(s, 10, "成果サマリー ─ 応募実績", "応募ゼロの状態から、20〜30代を中心に毎月応募が発生する状態へ");
-  // 左: 応募媒体別チャート
+  // 左: 応募媒体別チャート(年代内訳付きの積み上げ)
   s.addChart("bar", [
     {
-      name: "応募数",
-      labels: ["ヤギオファー", "求人BOX", "Indeed", "AirWork"],
-      values: [5, 3, 3, 2],
+      name: "20〜30代",
+      labels: ["ヤギオファー", "Indeed", "求人BOX", "AirWork"],
+      values: [4, 2, 1, 1],
+    },
+    {
+      name: "40代以上",
+      labels: ["ヤギオファー", "Indeed", "求人BOX", "AirWork"],
+      values: [1, 1, 2, 0],
     },
   ], {
-    x: 0.6, y: 1.85, w: 5.6, h: 3.3,
-    barDir: "bar",
-    chartColors: [ORANGE],
-    showTitle: true, title: "媒体別 応募数(2026年3〜7月・計13件)", titleFontSize: 13, titleColor: NAVY, titleFontFace: JP,
-    showValue: true, dataLabelPosition: "outEnd", dataLabelColor: NAVY, dataLabelFontSize: 11, dataLabelFontFace: JP,
+    x: 0.6, y: 1.85, w: 5.6, h: 3.5,
+    barDir: "bar", barGrouping: "stacked",
+    chartColors: [ORANGE, STEEL],
+    showTitle: true, title: "媒体別 応募者数と年代内訳(実人数12名)", titleFontSize: 13, titleColor: NAVY, titleFontFace: JP,
+    showValue: true, dataLabelPosition: "ctr", dataLabelColor: WHITE, dataLabelFontSize: 10, dataLabelFontFace: JP,
     catAxisLabelColor: "374151", catAxisLabelFontSize: 11, catAxisLabelFontFace: JP,
     valAxisLabelColor: GRAY, valAxisLabelFontSize: 9, valAxisMajorUnit: 1,
     valGridLine: { color: "E5E7EB", size: 0.5 }, catGridLine: { style: "none" },
-    showLegend: false,
+    showLegend: true, legendPos: "b", legendFontSize: 10, legendFontFace: JP, legendColor: "374151",
   });
-  s.addShape("roundRect", { x: 0.6, y: 5.4, w: 5.6, h: 1.3, rectRadius: 0.08, fill: { color: LIGHT } });
+  s.addShape("roundRect", { x: 0.6, y: 5.55, w: 5.6, h: 1.25, rectRadius: 0.08, fill: { color: LIGHT } });
   s.addText([
-    { text: "スカウト型(ヤギオファー)が最多。", options: { bold: true, color: NAVY } },
+    { text: "20〜30代の最大の獲得源はスカウト型(ヤギオファー: 4名)。", options: { bold: true, color: NAVY } },
     { text: "100通で2〜3名の反響と、業界平均(500通で1〜2名)を大きく上回る文面の刺さりを実証しました。", options: { color: "374151" } },
-  ], { x: 0.85, y: 5.55, w: 5.1, h: 1.0, fontFace: JP, fontSize: 11.5, margin: 0, valign: "top" });
+  ], { x: 0.85, y: 5.68, w: 5.1, h: 1.0, fontFace: JP, fontSize: 11, margin: 0, valign: "top" });
   // 右: 年齢帯別の応募実績(目的=20・30代)
   s.addText("年齢帯別の応募実績 ─ ターゲット層(20・30代)に到達", { x: 6.9, y: 1.85, w: 6, h: 0.4, fontFace: JP, fontSize: 15, bold: true, color: NAVY, margin: 0 });
   const ages = [
@@ -336,11 +341,22 @@ function statCard(slide, x, y, w, h, big, label, sub, accent) {
     fy += 0.74;
   });
   s.addText("※応募13件のうち1名は2媒体からの重複応募のため、実人数12名で集計", { x: 6.9, y: fy - 0.04, w: 5.9, h: 0.26, fontFace: JP, fontSize: 9, color: GRAY, margin: 0 });
-  s.addShape("roundRect", { x: 6.9, y: 5.55, w: 5.85, h: 1.25, rectRadius: 0.08, fill: { color: "FDF0E6" } });
+  // 月別の20〜30代応募推移
+  s.addText("20〜30代応募の月別推移", { x: 6.9, y: fy + 0.32, w: 5.85, h: 0.3, fontFace: JP, fontSize: 12, bold: true, color: NAVY, margin: 0 });
+  const monthly = [["3月", 2], ["4月", 0], ["5月", 2], ["6月", 2], ["7月", 2]];
+  monthly.forEach(([m, n], i) => {
+    const mx = 6.9 + i * 1.2;
+    s.addShape("roundRect", { x: mx, y: fy + 0.66, w: 1.05, h: 0.52, rectRadius: 0.05, fill: { color: n > 0 ? ORANGE : "E5E7EB" } });
+    s.addText([
+      { text: m + "  ", options: { fontSize: 9.5, color: n > 0 ? WHITE : GRAY } },
+      { text: `${n}名`, options: { fontSize: 11, bold: true, color: n > 0 ? WHITE : GRAY } },
+    ], { x: mx, y: fy + 0.66, w: 1.05, h: 0.52, fontFace: JP, align: "center", valign: "middle", margin: 0 });
+  });
+  s.addShape("roundRect", { x: 6.9, y: 5.95, w: 5.85, h: 1.05, rectRadius: 0.08, fill: { color: "FDF0E6" } });
   s.addText([
     { text: "応募者の67%(12名中8名)が20〜30代。", options: { bold: true, color: "B45309" } },
-    { text: "訴求転換(4月)以降も毎月2名ペースでターゲット年代の応募が継続しており、「若手に届く求人」への転換が数字で確認できます。", options: { color: "374151" } },
-  ], { x: 7.15, y: 5.7, w: 5.35, h: 1.0, fontFace: JP, fontSize: 11.5, margin: 0, valign: "top" });
+    { text: "毎月2名ペースでターゲット年代の応募が継続しており、「若手に届く求人」への転換が数字で確認できます。", options: { color: "374151" } },
+  ], { x: 7.15, y: 6.08, w: 5.35, h: 0.85, fontFace: JP, fontSize: 11, margin: 0, valign: "top" });
 }
 
 // ============ 11. 選考移行率の現在地 ============
