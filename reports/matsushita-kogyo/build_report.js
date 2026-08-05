@@ -51,16 +51,16 @@ function statCard(slide, x, y, w, h, big, label, sub, accent) {
 // ============ 2. エグゼクティブサマリー ============
 {
   const s = pres.addSlide();
-  titleSlide(s, 2, "エグゼクティブサマリー", "9ヶ月間の支援で「採用の土台」を構築し、応募が発生する状態までを実現しました");
-  statCard(s, 0.6, 1.7, 2.95, 1.75, "20回+", "定例ミーティング", "週次〜隔週で継続実施(社員インタビュー・説明会直前MTG含む)", ORANGE);
+  titleSlide(s, 2, "エグゼクティブサマリー", "目的である「20・30代の若手採用」に向け、応募の3分の2がターゲット年代という状態を実現しました");
+  statCard(s, 0.6, 1.7, 2.95, 1.75, "8/12名", "20〜30代の応募", "全応募者12名中8名(67%)がターゲット年代。毎月継続的に発生", ORANGE);
   statCard(s, 3.75, 1.7, 2.95, 1.75, "13件", "応募獲得(3〜7月)", "支援前の応募ゼロ状態から、毎月応募が発生する状態へ", ORANGE);
   statCard(s, 6.9, 1.7, 2.95, 1.75, "7媒体+", "採用チャネル構築", "Indeed・求人BOX・ヤギオファー・ハローワーク・Meta・Google・SNS", ORANGE);
   statCard(s, 10.05, 1.7, 2.7, 1.75, "33倍", "月間露出の拡大", "Indeed表示回数 108回(12月)→3,585回(6月)", ORANGE);
   const items = [
     ["採用基盤の整備", "社員インタビューによる訴求素材の発掘、求人原稿・面接フロー・媒体アカウントをゼロから構築し、求人を公開。"],
-    ["独自ポジションの確立", "検証を重ね、ペルソナを「オタク気質・マニア層」へ転換。「AIに代替されない技術」との2軸で、富山の採用競争における独自の立ち位置を確立。"],
-    ["応募導線の多様化", "自社説明会→オンライン説明会、LP改善、LINE公式、SNSと、応募ハードルを下げる導線を段階的に整備。"],
-    ["残る課題", "応募から面接・入社への転換が未達(入社0名)。8月以降の転職市場の再活性化に向けた具体策を本レポート末尾でご提案します。"],
+    ["20・30代に届く独自ポジションの確立", "検証を重ね、ペルソナを「オタク気質・マニア層」へ転換。「AIに代替されない技術」との2軸が奏功し、20〜30代が応募の中心に。"],
+    ["応募導線の多様化", "自社説明会→オンライン説明会、LP改善、LINE公式、SNSと、若手の応募ハードルを下げる導線を段階的に整備。"],
+    ["残る課題", "応募から選考への移行が壁(書類通過・面接0名)。20代の連絡途絶への対策と選考移行率の改善策を本レポートでご提案します。"],
   ];
   let y = 3.85;
   items.forEach(([h, b], i) => {
@@ -80,10 +80,11 @@ function statCard(slide, x, y, w, h, big, label, sub, accent) {
   const rows = [
     ["支援期間", "2025年12月 〜 2026年8月(9ヶ月)"],
     ["支援内容", "採用強化支援(募集職種:配管工・現場作業スタッフ/未経験・経験者)"],
+    ["ターゲット", "20・30代の未経験/第二新卒(オタク気質層)を主軸に、経験者を併用"],
     ["体制", "Talenco 佐々木(担当コンサルタント)・山本/株式会社サーキュレーション経由のご契約"],
     ["ミーティング", "定例ミーティングを週次〜隔週で実施(オンライン中心・議事録を毎回共有)"],
     ["月間広告予算", "計¥60,000(Indeed ¥30,000/求人BOX ¥10,000/ヤギオファー ¥10,000/Meta ¥10,000)"],
-    ["目標", "配管工の採用(週次進捗管理:目標1名・2026年2月〜52週)"],
+    ["目標", "20・30代の配管工採用(週次進捗管理:目標1名・2026年2月〜52週)"],
   ];
   const tableRows = rows.map(([k, v]) => [
     { text: k, options: { bold: true, color: WHITE, fill: { color: NAVY }, fontFace: JP, fontSize: 12.5, valign: "middle", margin: 0.08 } },
@@ -184,7 +185,10 @@ function statCard(slide, x, y, w, h, big, label, sub, accent) {
   s.addText("一般的な若手向け求人(ガテン系・「アットホーム」訴求)\n→ 若手に刺さらず、50代経験者層にのみ反応", { x: 0.85, y: 2.2, w: 5.0, h: 0.95, fontFace: JP, fontSize: 12, color: "374151", margin: 0 });
   s.addShape("roundRect", { x: 7.2, y: 1.75, w: 5.5, h: 1.5, rectRadius: 0.08, fill: { color: NAVY } });
   s.addText("転換後(2026年4月〜)", { x: 7.45, y: 1.9, w: 3, h: 0.3, fontFace: JP, fontSize: 11, bold: true, color: ORANGE, margin: 0 });
-  s.addText("ペルソナ=「オタク気質・マニア」層 × 「AIに代替されない技術」\n技術のパズル性・専門性で20〜30代の関心層に訴求", { x: 7.45, y: 2.2, w: 5.0, h: 0.95, fontFace: JP, fontSize: 12, color: "CADCFC", margin: 0 });
+  s.addText([
+    { text: "ペルソナ=「オタク気質・マニア」層 × 「AIに代替されない技術」", options: { color: "CADCFC", breakLine: true } },
+    { text: "→ 結果: 応募者の67%(12名中8名)が20〜30代に", options: { color: WHITE, bold: true } },
+  ], { x: 7.45, y: 2.2, w: 5.0, h: 0.95, fontFace: JP, fontSize: 12, margin: 0 });
   s.addShape("rightArrow", { x: 6.25, y: 2.28, w: 0.8, h: 0.45, fill: { color: ORANGE } });
   // 検証結果
   s.addText("訴求パターン検証の結果(Indeed CTR・2026年4月末)", { x: 0.6, y: 3.6, w: 8, h: 0.35, fontFace: JP, fontSize: 14, bold: true, color: NAVY, margin: 0 });
@@ -290,7 +294,7 @@ function statCard(slide, x, y, w, h, big, label, sub, accent) {
 // ============ 10. 成果サマリー(数値) ============
 {
   const s = pres.addSlide();
-  titleSlide(s, 10, "成果サマリー ─ 応募実績", "応募ゼロの状態から、複数媒体で毎月応募が発生する状態へ");
+  titleSlide(s, 10, "成果サマリー ─ 応募実績", "応募ゼロの状態から、20〜30代を中心に毎月応募が発生する状態へ");
   // 左: 応募媒体別チャート
   s.addChart("bar", [
     {
@@ -314,35 +318,88 @@ function statCard(slide, x, y, w, h, big, label, sub, accent) {
     { text: "スカウト型(ヤギオファー)が最多。", options: { bold: true, color: NAVY } },
     { text: "100通で2〜3名の反響と、業界平均(500通で1〜2名)を大きく上回る文面の刺さりを実証しました。", options: { color: "374151" } },
   ], { x: 0.85, y: 5.55, w: 5.1, h: 1.0, fontFace: JP, fontSize: 11.5, margin: 0, valign: "top" });
-  // 右: ファネルと率直な課題
-  s.addText("採用ファネルの現在地", { x: 6.9, y: 1.85, w: 6, h: 0.4, fontFace: JP, fontSize: 15, bold: true, color: NAVY, margin: 0 });
-  const funnel = [
-    ["表示(露出)", "約28,000回+", 5.8, NAVY],
-    ["クリック", "約1,550回", 4.6, NAVY],
-    ["応募", "13件", 3.4, ORANGE],
-    ["面接・入社", "0名", 2.2, STEEL],
+  // 右: 年齢帯別の応募実績(目的=20・30代)
+  s.addText("年齢帯別の応募実績 ─ ターゲット層(20・30代)に到達", { x: 6.9, y: 1.85, w: 6, h: 0.4, fontFace: JP, fontSize: 15, bold: true, color: NAVY, margin: 0 });
+  const ages = [
+    ["20代", "5名", 5.85, ORANGE, "(21・23・24・29・29歳)"],
+    ["30代", "3名", 4.35, ORANGE, "(31・35・36歳)"],
+    ["40代以上", "4名", 4.85, STEEL, "(48〜77歳・ターゲット外)"],
   ];
   let fy = 2.35;
-  funnel.forEach(([label, v, w, c]) => {
+  ages.forEach(([label, v, w, c, note]) => {
     s.addShape("roundRect", { x: 6.9, y: fy, w, h: 0.62, rectRadius: 0.06, fill: { color: c } });
     s.addText([
-      { text: label + "  ", options: { bold: true, fontSize: 12 } },
-      { text: v, options: { fontSize: 12 } },
+      { text: label + "  ", options: { bold: true, fontSize: 12.5 } },
+      { text: v + "  ", options: { fontSize: 12.5, bold: true } },
+      { text: note, options: { fontSize: 9.5 } },
     ], { x: 7.1, y: fy, w: w - 0.3, h: 0.62, fontFace: JP, color: WHITE, valign: "middle", margin: 0 });
-    fy += 0.72;
+    fy += 0.74;
   });
-  s.addText("※表示・クリックはIndeed+求人BOXの有料課金分合計", { x: 6.9, y: fy - 0.06, w: 5.9, h: 0.26, fontFace: JP, fontSize: 9, color: GRAY, margin: 0 });
+  s.addText("※応募13件のうち1名は2媒体からの重複応募のため、実人数12名で集計", { x: 6.9, y: fy - 0.04, w: 5.9, h: 0.26, fontFace: JP, fontSize: 9, color: GRAY, margin: 0 });
   s.addShape("roundRect", { x: 6.9, y: 5.55, w: 5.85, h: 1.25, rectRadius: 0.08, fill: { color: "FDF0E6" } });
   s.addText([
-    { text: "率直な課題: ", options: { bold: true, color: "B45309" } },
-    { text: "応募者の年齢・条件のミスマッチが多く、面接・入社への転換は未達です。「応募の質」を高める打ち手を次章でご提案します。", options: { color: "374151" } },
+    { text: "応募者の67%(12名中8名)が20〜30代。", options: { bold: true, color: "B45309" } },
+    { text: "訴求転換(4月)以降も毎月2名ペースでターゲット年代の応募が継続しており、「若手に届く求人」への転換が数字で確認できます。", options: { color: "374151" } },
   ], { x: 7.15, y: 5.7, w: 5.35, h: 1.0, fontFace: JP, fontSize: 11.5, margin: 0, valign: "top" });
 }
 
-// ============ 11. 会議・活動履歴 ============
+// ============ 11. 選考移行率の現在地 ============
 {
   const s = pres.addSlide();
-  titleSlide(s, 11, "活動履歴 ─ 定例ミーティング・説明会", "毎回議事録を共有し、決定事項を翌週までに実行するサイクルを継続");
+  titleSlide(s, 11, "選考移行率の現在地と課題", "応募は生まれましたが、選考への移行が壁 ─ ここが次の主戦場です");
+  // 左: 選考ファネル(移行率付き)
+  s.addText("選考ファネル(2026年3〜7月・実人数ベース)", { x: 0.6, y: 1.75, w: 6, h: 0.4, fontFace: JP, fontSize: 14, bold: true, color: NAVY, margin: 0 });
+  const funnel = [
+    ["応募", "12名(うち20〜30代8名)", 5.9, NAVY, ""],
+    ["説明会・選考ヒアリングへ移行", "3名", 4.5, ORANGE, "移行率 25%"],
+    ["書類選考通過(有効応募)", "0名", 3.1, STEEL, "移行率 0%"],
+    ["1次面接・入社", "0名", 2.4, STEEL, ""],
+  ];
+  let fy = 2.3;
+  funnel.forEach(([label, v, w, c, rate]) => {
+    s.addShape("roundRect", { x: 0.6, y: fy, w, h: 0.66, rectRadius: 0.06, fill: { color: c } });
+    s.addText([
+      { text: label + "  ", options: { bold: true, fontSize: 11.5 } },
+      { text: v, options: { fontSize: 11.5 } },
+    ], { x: 0.8, y: fy, w: w - 0.3, h: 0.66, fontFace: JP, color: WHITE, valign: "middle", margin: 0 });
+    if (rate) s.addText(rate, { x: 0.6 + w + 0.15, y: fy, w: 1.6, h: 0.66, fontFace: JP, fontSize: 10.5, bold: true, color: c, valign: "middle", margin: 0 });
+    fy += 0.78;
+  });
+  s.addText("対応中: 説明会誘導中1名(36歳)・選考/説明会ヒアリング中2名(23歳・53歳) ※8月継続対応", { x: 0.6, y: fy + 0.02, w: 6.2, h: 0.5, fontFace: JP, fontSize: 10, color: GRAY, margin: 0 });
+  s.addShape("roundRect", { x: 0.6, y: 6.05, w: 6.1, h: 1.0, rectRadius: 0.08, fill: { color: "FDF0E6" } });
+  s.addText([
+    { text: "20〜30代8名のうち選考対応が継続できているのは1名(23歳)。", options: { bold: true, color: "B45309" } },
+    { text: "応募獲得の次は「つながり続ける仕組み」が成果の鍵です。", options: { color: "374151" } },
+  ], { x: 0.85, y: 6.18, w: 5.6, h: 0.8, fontFace: JP, fontSize: 11, margin: 0, valign: "top" });
+  // 右: 移行を阻んだ要因と実施済みの対応
+  s.addText("移行を阻んだ3つの要因", { x: 7.15, y: 1.75, w: 5.6, h: 0.4, fontFace: JP, fontSize: 14, bold: true, color: NAVY, margin: 0 });
+  const factors = [
+    ["20代前半の連絡途絶", "メールを見ない・返信が途切れる傾向(21歳は書類依頼後に連絡なし)。若手ほど発生しやすい"],
+    ["ターゲット外応募の混在", "77歳×2・53歳・48歳など、応募12名のうち4名(33%)がターゲット外。お断り対応が負担に"],
+    ["スカウト承認後の音信不通", "説明会誘導後にSMS既読が付かないケース(36歳)。接点の維持が課題"],
+  ];
+  let ry = 2.2;
+  factors.forEach(([h, b], i) => {
+    circleIcon(s, 7.15, ry + 0.02, String(i + 1), STEEL);
+    s.addText([
+      { text: h + "  ", options: { bold: true, color: NAVY } },
+      { text: b, options: { color: "374151" } },
+    ], { x: 7.72, y: ry - 0.05, w: 5.0, h: 0.85, fontFace: JP, fontSize: 11, margin: 0, valign: "top" });
+    ry += 0.92;
+  });
+  s.addShape("roundRect", { x: 7.15, y: 5.05, w: 5.6, h: 2.0, rectRadius: 0.08, fill: { color: LIGHT } });
+  s.addText("実施済みの対応", { x: 7.4, y: 5.2, w: 5.1, h: 0.35, fontFace: JP, fontSize: 12.5, bold: true, color: ORANGE, margin: 0 });
+  s.addText([
+    { text: "連絡順序を「固定電話→SMS」に変更(若手はメールを見ないため)", options: { bullet: { code: "2022", color: ORANGE }, breakLine: true } },
+    { text: "応募者をSMS・電話でオンライン説明会(顔出しなし)へ誘導", options: { bullet: { code: "2022", color: ORANGE }, breakLine: true } },
+    { text: "LINE公式アカウントで若手が返信しやすい接点を追加", options: { bullet: { code: "2022", color: ORANGE } } },
+  ], { x: 7.4, y: 5.6, w: 5.15, h: 1.35, fontFace: JP, fontSize: 10.5, color: "374151", margin: 0, paraSpaceAfter: 7, valign: "top" });
+}
+
+// ============ 12. 会議・活動履歴 ============
+{
+  const s = pres.addSlide();
+  titleSlide(s, 12, "活動履歴 ─ 定例ミーティング・説明会", "毎回議事録を共有し、決定事項を翌週までに実行するサイクルを継続");
   const left = [
     ["11/20", "初回面談"],
     ["12/5", "キックオフ(富山ご訪問)"],
@@ -383,14 +440,14 @@ function statCard(slide, x, y, w, h, big, label, sub, accent) {
   s.addText("2025年11月〜2026年8月:定例・インタビュー・説明会など合計30回以上の接点。すべての回で議事録(Gemini自動メモ)を共有済み。", { x: 0.6, y: 6.75, w: 12.2, h: 0.4, fontFace: JP, fontSize: 11, color: GRAY, margin: 0 });
 }
 
-// ============ 12. 今後の提言 ============
+// ============ 13. 今後の提言 ============
 {
   const s = pres.addSlide();
-  titleSlide(s, 12, "今後のご提言", "8月以降の転職市場再活性化(ピーク:9〜10月)を最大限に活かすために");
+  titleSlide(s, 13, "今後のご提言", "8月以降の転職市場再活性化(ピーク:9〜10月)を最大限に活かすために");
   const recs = [
     ["1", "Instagram×HP導線の確立", "リニューアルHPとInstagramを紐付け、「求人媒体→Instagram→HP→説明会」の導線を完成させる。静止画+文字の定期投稿を継続し、会社の「人となり」で応募の質を高める"],
     ["2", "転職フェア・職人スカウトの実行判断", "マイナビ転職フェア富山(10月・1月)は20〜30代来場が中心でターゲット合致。出展費用の交渉結果を踏まえ9月中に出展可否を判断。職人スカウトは北陸登録者数の回答次第で費用対効果を見極め"],
-    ["3", "応募の「質」への転換", "オンライン説明会を起点に、応募前ヒアリングで年齢・条件のミスマッチを削減。ヤギオファーの好反応文面を横展開し、ターゲット層(20〜30代オタク気質)への到達を強化"],
+    ["3", "20〜30代の選考移行率の改善(最重要)", "初回接触を24時間以内・固定電話→SMS→LINEの順で徹底し、若手の連絡途絶を防止。オンライン説明会への誘導を全応募者の標準フローにし、「応募→説明会参加」の移行率をKPIとして毎週計測"],
     ["4", "休日制度の検討(中長期)", "若年層応募の最大障壁は「年間休日数」(競合は土日祝休み訴求)。土曜出勤の段階的見直しは、採用競争力に直結する経営テーマとしてご検討を推奨"],
     ["5", "計測基盤の整備", "LP・広告の効果測定(コンバージョン計測・GA4)を整備し、8月以降の投資判断を数値で行える状態にする"],
   ];
