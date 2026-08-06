@@ -433,10 +433,123 @@ function statCard(slide, x, y, w, h, big, label, sub, accent) {
   });
 }
 
-// ============ 13. 今後の提言 ============
+// ============ 13. 課題①詳細 ============
 {
   const s = pres.addSlide();
-  titleSlide(s, 13, "今後のご提言 ─ 3つの課題に対応する打ち手", "8月以降の転職市場再活性化(ピーク:9〜10月)を最大限に活かすために");
+  titleSlide(s, 13, "課題① 経験者・関連業種の人材不足", "配管工の経験者採用は「母数」の壁 ─ 待つ採用では出会えない市場");
+  // 左: 検証データ
+  s.addText("9ヶ月の検証で確認された事実", { x: 0.6, y: 1.75, w: 6, h: 0.4, fontFace: JP, fontSize: 14, bold: true, color: NAVY, margin: 0 });
+  const facts1 = [
+    ["経験者向け求人は応募ゼロ", "表示は伸びる(321件/週)ものの応募開始0件。CTR16.7%と関心はあるが、転職顕在層が現れない(4月検証)"],
+    ["スカウト対象母数の枯渇", "ヤギオファーで22〜39歳・通勤30分圏の対象者が残0名に(6月)。新規登録も1日1〜4名と細い"],
+    ["富山の採用難易度は最高水準", "「配管工」の求人難易度スコアは99(100が最難)。検索する求職者自体が少ない(206名/月)"],
+  ];
+  let y1 = 2.2;
+  facts1.forEach(([h, b], i) => {
+    s.addShape("roundRect", { x: 0.6, y: y1, w: 6.1, h: 1.35, rectRadius: 0.08, fill: { color: LIGHT } });
+    s.addText(h, { x: 0.85, y: y1 + 0.13, w: 5.6, h: 0.34, fontFace: JP, fontSize: 12.5, bold: true, color: NAVY, margin: 0 });
+    s.addText(b, { x: 0.85, y: y1 + 0.48, w: 5.6, h: 0.8, fontFace: JP, fontSize: 10.5, color: "374151", margin: 0, valign: "top" });
+    y1 += 1.5;
+  });
+  // 右: 電気工事との対比と含意
+  s.addText("周辺業種との比較が示すもの", { x: 7.1, y: 1.75, w: 5.7, h: 0.4, fontFace: JP, fontSize: 14, bold: true, color: NAVY, margin: 0 });
+  s.addShape("roundRect", { x: 7.1, y: 2.2, w: 5.65, h: 2.0, rectRadius: 0.08, fill: { color: LIGHT } });
+  s.addText([
+    { text: "電気工事(周辺企業)では応募・採用実績あり\n", options: { bold: true, color: NAVY, fontSize: 12.5 } },
+    { text: "同じ建設系でも、電気工事の支援先では相応の応募数・採用数が出ています。配管工との差は施策の巧拙ではなく、職種ごとの求職者人口の差 ─ つまり市場の構造要因です。", options: { color: "374151", fontSize: 10.5 } },
+  ], { x: 7.35, y: 2.35, w: 5.15, h: 1.7, fontFace: JP, margin: 0, valign: "top" });
+  s.addShape("roundRect", { x: 7.1, y: 4.4, w: 5.65, h: 2.25, rectRadius: 0.08, fill: { color: NAVY } });
+  s.addText([
+    { text: "含意: 未経験×20・30代への注力が合理的\n", options: { bold: true, color: ORANGE, fontSize: 12.5 } },
+    { text: "経験者の「応募待ち」に予算を割くよりも、市場に存在する未経験の若手を採用し、社内で育てる(資格全額支援・約3年で一人前)方が、確率も再現性も高い戦い方です。実際に応募の67%が20〜30代と、この路線の入口は既に開通しています。", options: { color: "CADCFC", fontSize: 10.5 } },
+  ], { x: 7.35, y: 4.58, w: 5.15, h: 1.9, fontFace: JP, margin: 0, valign: "top" });
+}
+
+// ============ 14. 課題②詳細 ============
+{
+  const s = pres.addSlide();
+  titleSlide(s, 14, "課題② 情報の透明性不足(未経験・20/30代)", "求人で興味を持った求職者が「裏付け」を取れず、応募の一歩手前で離脱");
+  // 上: 求職者の行動フローと情報の有無
+  s.addText("未経験の求職者が応募前にたどる行動と、松下工業様の現状", { x: 0.6, y: 1.7, w: 11, h: 0.4, fontFace: JP, fontSize: 14, bold: true, color: NAVY, margin: 0 });
+  const flow = [
+    ["求人を見る", "求人原稿10件超\nキャッチ画像も整備", true],
+    ["会社名で検索", "採用サイトなし\nHPは工事情報中心", false],
+    ["口コミを探す", "口コミ情報なし\n判断材料ゼロ", false],
+    ["SNSを見る", "Xは尖った発信のみ\nInstagramは開始直後", false],
+    ["応募 or 離脱", "説明会予約CV 0件\n(裏付け不足で離脱)", false],
+  ];
+  let fx = 0.6;
+  flow.forEach(([h, b, ok], i) => {
+    s.addShape("roundRect", { x: fx, y: 2.2, w: 2.25, h: 1.75, rectRadius: 0.08, fill: { color: ok ? NAVY : LIGHT } });
+    s.addText(h, { x: fx + 0.15, y: 2.32, w: 1.95, h: 0.4, fontFace: JP, fontSize: 11.5, bold: true, color: ok ? WHITE : NAVY, margin: 0 });
+    s.addText(b, { x: fx + 0.15, y: 2.78, w: 1.95, h: 1.05, fontFace: JP, fontSize: 9.5, color: ok ? "CADCFC" : "6B7280", margin: 0, valign: "top" });
+    s.addText(ok ? "○ 整備済み" : "× 情報なし", { x: fx + 0.15, y: 3.62, w: 1.95, h: 0.28, fontFace: JP, fontSize: 9.5, bold: true, color: ok ? ORANGE : "B45309", margin: 0 });
+    if (i < 4) s.addShape("rightArrow", { x: fx + 2.27, y: 2.9, w: 0.28, h: 0.32, fill: { color: STEEL } });
+    fx += 2.53;
+  });
+  // 下: 不足している情報と打ち手
+  s.addShape("roundRect", { x: 0.6, y: 4.35, w: 6.1, h: 2.5, rectRadius: 0.08, fill: { color: LIGHT } });
+  s.addText("特に不足している3つの情報", { x: 0.85, y: 4.5, w: 5.6, h: 0.35, fontFace: JP, fontSize: 12.5, bold: true, color: NAVY, margin: 0 });
+  s.addText([
+    { text: "働き方 ─ 17時退社・休日・残業の実態など、生活がイメージできる情報", options: { bullet: { code: "2022", color: ORANGE }, breakLine: true } },
+    { text: "業務内容 ─ 1日の流れ・現場の様子・未経験からの成長ステップ", options: { bullet: { code: "2022", color: ORANGE }, breakLine: true } },
+    { text: "働く人 ─ どんな先輩がいるか・年齢構成・職場の雰囲気", options: { bullet: { code: "2022", color: ORANGE } } },
+  ], { x: 0.85, y: 4.95, w: 5.6, h: 1.75, fontFace: JP, fontSize: 11, color: "374151", margin: 0, paraSpaceAfter: 9, valign: "top" });
+  s.addShape("roundRect", { x: 7.1, y: 4.35, w: 5.65, h: 2.5, rectRadius: 0.08, fill: { color: NAVY } });
+  s.addText("打ち手: 採用HPリニューアル+Instagram", { x: 7.35, y: 4.5, w: 5.15, h: 0.35, fontFace: JP, fontSize: 12.5, bold: true, color: ORANGE, margin: 0 });
+  s.addText([
+    { text: "採用HPリニューアル(お盆前完了予定)に「働き方・業務内容・働く人」のコンテンツを集約", options: { bullet: { code: "2022", color: ORANGE }, breakLine: true } },
+    { text: "Instagramで同テーマを定期投稿し、検索時の受け皿に(静止画+文字で社長が自走できる運用)", options: { bullet: { code: "2022", color: ORANGE }, breakLine: true } },
+    { text: "求人媒体→Instagram→HPの導線で、どこから調べても情報に辿り着ける状態へ", options: { bullet: { code: "2022", color: ORANGE } } },
+  ], { x: 7.35, y: 4.95, w: 5.15, h: 1.75, fontFace: JP, fontSize: 10.5, color: "CADCFC", margin: 0, paraSpaceAfter: 8, valign: "top" });
+}
+
+// ============ 15. 課題③詳細 ============
+{
+  const s = pres.addSlide();
+  titleSlide(s, 15, "課題③ 求職者との直接接点の不足", "情報の不透明性を補う最短ルートは「直接会って話す」こと ─ 集客は他社の力を借りる");
+  // 左: 自社集客の実績
+  s.addText("自社集客イベントの実績", { x: 0.6, y: 1.75, w: 6, h: 0.4, fontFace: JP, fontSize: 14, bold: true, color: NAVY, margin: 0 });
+  const own = [
+    ["自社説明会(対面)", "3/14・4/11・6/20・6/27", "申込 0〜1名"],
+    ["オンライン説明会", "7/16・23・30(毎週木曜)", "LP予約CV 0件"],
+    ["ハローワーク説明会", "4/28(他社集客型)", "2名参加"],
+  ];
+  const ownRows = [["形式", "実施", "集客結果"]].concat(own).map((r, ri) => r.map((c) => ({
+    text: c,
+    options: ri === 0
+      ? { bold: true, color: WHITE, fill: { color: NAVY }, fontFace: JP, fontSize: 10.5, align: "center", valign: "middle", margin: 0.05 }
+      : { color: "374151", fill: { color: ri % 2 ? LIGHT : WHITE }, fontFace: JP, fontSize: 10.5, align: "center", valign: "middle", margin: 0.05 },
+  })));
+  s.addTable(ownRows, { x: 0.6, y: 2.2, w: 6.1, colW: [2.0, 2.4, 1.7], rowH: 0.52, border: { type: "solid", color: "D1D5DB", pt: 0.5 } });
+  s.addShape("roundRect", { x: 0.6, y: 4.6, w: 6.1, h: 2.1, rectRadius: 0.08, fill: { color: "FDF0E6" } });
+  s.addText([
+    { text: "唯一集客できたのは「他社(ハローワーク)が集めた場」。", options: { bold: true, color: "B45309" } },
+    { text: "自社単独の集客はWeb広告を投下しても実参加に至らず、説明会そのものの品質(資料・運営・オンライン化)は整備済みのため、残る変数は「集客力」のみです。", options: { color: "374151" } },
+  ], { x: 0.85, y: 4.78, w: 5.6, h: 1.75, fontFace: JP, fontSize: 11, margin: 0, valign: "top" });
+  // 右: 他社集客型の選択肢
+  s.addText("打ち手: 他社集客型イベントへの参加", { x: 7.1, y: 1.75, w: 5.7, h: 0.4, fontFace: JP, fontSize: 14, bold: true, color: NAVY, margin: 0 });
+  const ext = [
+    ["ハローワーク説明会", "無料・次回8/28以降で予約可。他社事例では予約19名・参加14名の実績も(施工管理職)。PRシート・写真掲載は整備済みですぐ乗れる"],
+    ["マイナビ転職フェア富山", "来場151名・参加67社、20〜30代来場が中心でターゲット合致。10月・1月開催。出展費用(推定20〜35万円)は交渉のうえ9月中に判断"],
+    ["建設職人特化スカウト", "「職人スカウト」(登録3,300名)は北陸登録者数の回答待ち。費用対効果次第で追加"],
+  ];
+  let ey = 2.2;
+  ext.forEach(([h, b], i) => {
+    circleIcon(s, 7.1, ey + 0.02, String(i + 1), ORANGE);
+    s.addText([
+      { text: h + "\n", options: { bold: true, color: NAVY, fontSize: 12 } },
+      { text: b, options: { color: "374151", fontSize: 10.5 } },
+    ], { x: 7.67, y: ey - 0.05, w: 5.1, h: 1.35, fontFace: JP, margin: 0, valign: "top" });
+    ey += 1.42;
+  });
+  s.addText("※ 説明会は「集客の場」から「クロージングの場」へ役割を再定義。出会いは外部で、深い相互理解は自社の説明会で。", { x: 7.1, y: 6.5, w: 5.65, h: 0.6, fontFace: JP, fontSize: 10, color: GRAY, margin: 0 });
+}
+
+// ============ 16. 今後の提言 ============
+{
+  const s = pres.addSlide();
+  titleSlide(s, 16, "今後のご提言 ─ 3つの課題に対応する打ち手", "8月以降の転職市場再活性化(ピーク:9〜10月)を最大限に活かすために");
   const recs = [
     ["1", "採用HPリニューアル+Instagramで「情報の透明性」を確保", "「働き方・業務内容・どんな人が働いているか」を軸に発信を強化。リニューアルHP(お盆前完了予定)とInstagramを紐付け、求人から裏付けを取りに来た求職者が必ず情報に辿り着ける状態をつくる", "課題②"],
     ["2", "他社集客型イベントで求職者と直接交流", "ハローワーク説明会(8/28以降予約可)と、マイナビ転職フェア富山(10月・1月、20〜30代来場中心)等の合同説明会に参加。自社集客に依存せず、対面交流で情報不足への不安を解消する", "課題③"],
@@ -457,10 +570,48 @@ function statCard(slide, x, y, w, h, big, label, sub, accent) {
   });
 }
 
-// ============ 14. 会議・活動履歴 ============
+// ============ 17. 実行ロードマップ ============
 {
   const s = pres.addSlide();
-  titleSlide(s, 14, "活動履歴 ─ 定例ミーティング・説明会", "毎回議事録を共有し、決定事項を翌週までに実行するサイクルを継続");
+  titleSlide(s, 17, "実行ロードマップ(2026年8月〜)", "市場ピーク(9〜10月)に間に合わせる時系列プラン");
+  const cols = [
+    ["8月", "土台を仕上げる", [
+      "採用HPリニューアル完了(お盆前)・Instagram連携",
+      "Instagram定期投稿の開始(働き方・業務内容・働く人)",
+      "ハローワーク説明会の予約(8/28以降の枠)",
+      "SMS→LINEの連絡フローを全応募者に標準化",
+    ], ORANGE],
+    ["9月", "接点を仕込む", [
+      "マイナビ転職フェア出展の可否判断(費用交渉の結果を反映)",
+      "職人スカウトの費用対効果判断(北陸登録者数の回答受領後)",
+      "「応募→説明会参加」移行率のKPI週次計測を開始",
+      "求人・広告は20・30代向け2軸訴求へ予算集中",
+    ], NAVY],
+    ["10月〜", "ピークで刈り取る", [
+      "ハローワーク説明会・転職フェア(10月/1月)へ参加",
+      "フェア来場者をオンライン説明会・LINEへ接続",
+      "Instagram・HPの反応を見てコンテンツを月次で改善",
+      "年間休日数の見直し検討(中長期・経営テーマ)",
+    ], STEEL],
+  ];
+  let cx = 0.6;
+  cols.forEach(([term, theme, items, c]) => {
+    s.addShape("roundRect", { x: cx, y: 1.8, w: 3.9, h: 0.75, rectRadius: 0.08, fill: { color: c } });
+    s.addText([
+      { text: term + "  ", options: { bold: true, fontSize: 16 } },
+      { text: theme, options: { fontSize: 12 } },
+    ], { x: cx, y: 1.8, w: 3.9, h: 0.75, fontFace: JP, color: WHITE, align: "center", valign: "middle", margin: 0 });
+    s.addShape("roundRect", { x: cx, y: 2.7, w: 3.9, h: 4.1, rectRadius: 0.08, fill: { color: LIGHT } });
+    s.addText(items.map((t, i) => ({ text: t, options: { bullet: { code: "2022", color: c }, breakLine: i < items.length - 1 } })),
+      { x: cx + 0.25, y: 2.95, w: 3.4, h: 3.6, fontFace: JP, fontSize: 10.5, color: "374151", margin: 0, paraSpaceAfter: 10, valign: "top" });
+    cx += 4.19;
+  });
+}
+
+// ============ 18. 会議・活動履歴 ============
+{
+  const s = pres.addSlide();
+  titleSlide(s, 18, "活動履歴 ─ 定例ミーティング・説明会", "毎回議事録を共有し、決定事項を翌週までに実行するサイクルを継続");
   const left = [
     ["11/20", "初回面談"],
     ["12/5", "キックオフ(富山ご訪問)"],
