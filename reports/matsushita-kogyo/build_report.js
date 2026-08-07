@@ -663,10 +663,45 @@ function statCard(slide, x, y, w, h, big, label, sub, accent) {
   ], { x: 0.85, y: 6.45, w: 11.7, h: 0.6, fontFace: JP, fontSize: 10.5, margin: 0, valign: "middle" });
 }
 
-// ============ 19. 課題③詳細 ============
+// ============ 19. Instagram投稿案リスト ============
 {
   const s = pres.addSlide();
-  titleSlide(s, 19, "課題③ 求職者との直接接点の不足", "情報の不透明性を補う最短ルートは「直接会って話す」こと ─ 集客は他社の力を借りる");
+  titleSlide(s, 19, "Instagram投稿案リスト(初期3ヶ月)", "全て収集済みの実素材から制作可能。各投稿に「何の透明性を上げるか」の目的を設定しています");
+  const posts = [
+    ["1", "「17時、社長より先には帰りづらい?いいえ、帰れます」─ 夕方の事務所と退社風景", "働き方(定時退社の実態)", "安心"],
+    ["2", "配管工の1日 ─ 出社から17時退社までのスケジュール密着", "業務内容(1日の流れ)", "安心"],
+    ["3", "転職ストーリー: 前職は残業100時間超→今は毎日17時帰宅(社員の実話)", "働く人(転職者のリアル)", "共感"],
+    ["4", "未経験1年目は穴掘りから ─ 3年で一人前になる成長ステップ", "業務内容(未経験の育ち方)", "安心"],
+    ["5", "資格の話: 費用は全額会社負担・受験日は出勤扱い・社員平均11資格", "制度の運用実態", "安定"],
+    ["6", "「マニアック上等!」工具・新工法紹介シリーズ", "仕事の面白さ(技術)", "共感"],
+    ["7", "正直に言います、夏の現場は大変です ─ だから会社がやっている対策", "働き方の両面(大変さ+支援)", "安心"],
+    ["8", "先輩紹介Q&A: 怒鳴る親方ゼロ・「さん付け」文化の現場", "働く人(職場の雰囲気)", "共感"],
+    ["9", "給与の中身: 月給28万円〜の根拠と、どう上がっていくか", "待遇(給与の計算根拠)", "安定"],
+    ["10", "配管はパズルだ ─ 施工ビフォーアフター写真", "業務内容(仕事の成果)", "共感"],
+    ["11", "創業70年、富山のインフラを支えてきた仕事 ─ 官公庁・ガス会社との取引", "会社の足腰(事業基盤)", "安定"],
+    ["12", "オンライン説明会のご案内 ─ 顔出し不要・木曜夜45分・参加の流れ", "応募プロセス(参加ハードル)", "行動喚起"],
+  ];
+  const header = [
+    { text: "#", options: { bold: true, color: WHITE, fill: { color: NAVY }, fontFace: JP, fontSize: 10, align: "center", valign: "middle", margin: 0.03 } },
+    { text: "投稿案", options: { bold: true, color: WHITE, fill: { color: NAVY }, fontFace: JP, fontSize: 10, align: "center", valign: "middle", margin: 0.03 } },
+    { text: "目的: 何の透明性を上げるか", options: { bold: true, color: WHITE, fill: { color: NAVY }, fontFace: JP, fontSize: 10, align: "center", valign: "middle", margin: 0.03 } },
+    { text: "テーマ", options: { bold: true, color: WHITE, fill: { color: NAVY }, fontFace: JP, fontSize: 10, align: "center", valign: "middle", margin: 0.03 } },
+  ];
+  const themeColor = { "共感": ORANGE, "安心": NAVY, "安定": STEEL, "行動喚起": "B45309" };
+  const body = posts.map(([n, title, goal, theme], ri) => [
+    { text: n, options: { color: GRAY, fill: { color: ri % 2 ? WHITE : LIGHT }, fontFace: JP, fontSize: 9.5, align: "center", valign: "middle", margin: 0.03 } },
+    { text: title, options: { color: "374151", fill: { color: ri % 2 ? WHITE : LIGHT }, fontFace: JP, fontSize: 9.5, valign: "middle", margin: 0.05 } },
+    { text: goal, options: { color: NAVY, fill: { color: ri % 2 ? WHITE : LIGHT }, fontFace: JP, fontSize: 9.5, valign: "middle", margin: 0.05 } },
+    { text: theme, options: { bold: true, color: themeColor[theme], fill: { color: ri % 2 ? WHITE : LIGHT }, fontFace: JP, fontSize: 9.5, align: "center", valign: "middle", margin: 0.03 } },
+  ]);
+  s.addTable([header].concat(body), { x: 0.6, y: 1.7, w: 12.15, colW: [0.5, 6.55, 3.6, 1.5], rowH: 0.375, border: { type: "solid", color: "E5E7EB", pt: 0.5 } });
+  s.addText("運用の目安: 週2〜3投稿でこのリストを約1ヶ月半で一巡 → 反応(保存・プロフィールアクセス)の良いテーマを2巡目で厚くする。#7のような「両面開示」投稿を必ず混ぜるのがポイント(応募継続要因の第1位=良い面・悪い面の両方が見える 73.6%)。", { x: 0.6, y: 6.5, w: 12.15, h: 0.65, fontFace: JP, fontSize: 10, color: GRAY, margin: 0 });
+}
+
+// ============ 20. 課題③詳細 ============
+{
+  const s = pres.addSlide();
+  titleSlide(s, 20, "課題③ 求職者との直接接点の不足", "情報の不透明性を補う最短ルートは「直接会って話す」こと ─ 集客は他社の力を借りる");
   // 左: 自社集客の実績
   s.addText("自社集客イベントの実績", { x: 0.6, y: 1.75, w: 6, h: 0.4, fontFace: JP, fontSize: 14, bold: true, color: NAVY, margin: 0 });
   const own = [
@@ -705,10 +740,10 @@ function statCard(slide, x, y, w, h, big, label, sub, accent) {
   s.addText("※ 説明会は「集客の場」から「クロージングの場」へ役割を再定義。出会いは外部で、深い相互理解は自社の説明会で。", { x: 7.1, y: 6.5, w: 5.65, h: 0.6, fontFace: JP, fontSize: 10, color: GRAY, margin: 0 });
 }
 
-// ============ 20. 今後の提言 ============
+// ============ 21. 今後の提言 ============
 {
   const s = pres.addSlide();
-  titleSlide(s, 20, "今後のご提言 ─ 3つの課題に対応する打ち手", "8月以降の転職市場再活性化(ピーク:9〜10月)を最大限に活かすために");
+  titleSlide(s, 21, "今後のご提言 ─ 3つの課題に対応する打ち手", "8月以降の転職市場再活性化(ピーク:9〜10月)を最大限に活かすために");
   const recs = [
     ["1", "採用HPリニューアル+Instagramで「情報の透明性」を確保", "「働き方・業務内容・どんな人が働いているか」を軸に発信を強化。リニューアルHP(お盆前完了予定)とInstagramを紐付け、求人から裏付けを取りに来た求職者が必ず情報に辿り着ける状態をつくる", "課題②"],
     ["2", "他社集客型イベントで求職者と直接交流", "ハローワーク説明会(8/28以降予約可)と、マイナビ転職フェア富山(10月・1月、20〜30代来場中心)等の合同説明会に参加。自社集客に依存せず、対面交流で情報不足への不安を解消する", "課題③"],
@@ -729,10 +764,10 @@ function statCard(slide, x, y, w, h, big, label, sub, accent) {
   });
 }
 
-// ============ 21. 実行ロードマップ ============
+// ============ 22. 実行ロードマップ ============
 {
   const s = pres.addSlide();
-  titleSlide(s, 21, "実行ロードマップ(2026年8月〜)", "市場ピーク(9〜10月)に間に合わせる時系列プラン");
+  titleSlide(s, 22, "実行ロードマップ(2026年8月〜)", "市場ピーク(9〜10月)に間に合わせる時系列プラン");
   const cols = [
     ["8月", "土台を仕上げる", [
       "採用HPリニューアル完了(お盆前)・Instagram連携",
@@ -768,10 +803,10 @@ function statCard(slide, x, y, w, h, big, label, sub, accent) {
   });
 }
 
-// ============ 22. 会議・活動履歴 ============
+// ============ 23. 会議・活動履歴 ============
 {
   const s = pres.addSlide();
-  titleSlide(s, 22, "活動履歴 ─ 定例ミーティング・説明会", "毎回議事録を共有し、決定事項を翌週までに実行するサイクルを継続");
+  titleSlide(s, 23, "活動履歴 ─ 定例ミーティング・説明会", "毎回議事録を共有し、決定事項を翌週までに実行するサイクルを継続");
   const left = [
     ["11/20", "初回面談"],
     ["12/5", "キックオフ(富山ご訪問)"],
