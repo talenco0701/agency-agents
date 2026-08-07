@@ -545,10 +545,42 @@ function statCard(slide, x, y, w, h, big, label, sub, accent) {
   });
 }
 
-// ============ 16. 発信プラン(2) コンテンツ例 ============
+// ============ 16. 発信プラン(2) 公開調査の裏付け ============
 {
   const s = pres.addSlide();
-  titleSlide(s, 16, "情報発信プラン ─ 共感・安心・安定", "透明性向上の鍵はHP・SNS(特にInstagram)での発信。3つの感情に訴求するコンテンツを継続投稿します");
+  titleSlide(s, 16, "公開調査も示す「SNS・口コミ時代」の応募行動", "松下工業様固有の課題ではなく、求職者行動そのものの変化です(当社調べ・公開調査整理レポートより)");
+  const stats = [
+    ["83.8%", "求人票・公式サイト以外にSNS・口コミサイトを確認する", "転職活動の標準手順に。目的は実態把握77.1%・公式情報の裏付け51.6%"],
+    ["43.8%", "情報が食い違ったときSNS・口コミ側を信頼", "公式サイト・求人票側は29.1%。公式情報は自動的には信じてもらえない"],
+    ["48.0%", "SNS・口コミを理由に応募をやめた・辞退した経験", "うち「応募自体を見送った」が34.5%と約3人に1人"],
+    ["85%", "口コミで不安になっても企業には質問しない", "企業には「応募が来ない」という結果だけが残り、原因は伝わらない"],
+  ];
+  let sx2 = 0.6;
+  stats.forEach(([big, label, sub]) => {
+    s.addShape("roundRect", { x: sx2, y: 1.8, w: 2.98, h: 2.55, rectRadius: 0.08, fill: { color: LIGHT } });
+    s.addText(big, { x: sx2 + 0.18, y: 1.95, w: 2.6, h: 0.6, fontFace: JP, fontSize: 28, bold: true, color: ORANGE, margin: 0 });
+    s.addText(label, { x: sx2 + 0.18, y: 2.6, w: 2.65, h: 0.85, fontFace: JP, fontSize: 10.5, bold: true, color: NAVY, margin: 0, valign: "top" });
+    s.addText(sub, { x: sx2 + 0.18, y: 3.48, w: 2.65, h: 0.8, fontFace: JP, fontSize: 9, color: GRAY, margin: 0, valign: "top" });
+    sx2 += 3.18;
+  });
+  // 下段: 発信への示唆2つ
+  s.addShape("roundRect", { x: 0.6, y: 4.6, w: 5.95, h: 1.85, rectRadius: 0.08, fill: { color: NAVY } });
+  s.addText([
+    { text: "求められるのは「両面が見える」情報\n", options: { bold: true, color: ORANGE, fontSize: 12.5 } },
+    { text: "応募を続けたいと感じる状態の第1位は「良い面・悪い面の両方が見える」(73.6%)。大変な点は隠さず、「夏場の現場は大変→だから休憩・空調服支給」のように支援策までセットで書くのが正解。", options: { color: "CADCFC", fontSize: 10 } },
+  ], { x: 0.85, y: 4.75, w: 5.45, h: 1.6, fontFace: JP, margin: 0, valign: "top" });
+  s.addShape("roundRect", { x: 6.8, y: 4.6, w: 5.95, h: 1.85, rectRadius: 0.08, fill: { color: NAVY } });
+  s.addText([
+    { text: "「過度なキラキラ感」は離脱要因\n", options: { bold: true, color: ORANGE, fontSize: 12.5 } },
+    { text: "企業SNSで応募をやめたくなる要素には「過度な演出」(44.2%)、「公式情報と実態の乖離」(45.7%)。取り繕った発信は逆効果 ─ 等身大の静止画+文字での発信方針は、この調査結果とも合致します。", options: { color: "CADCFC", fontSize: 10 } },
+  ], { x: 7.05, y: 4.75, w: 5.45, h: 1.6, fontFace: JP, margin: 0, valign: "top" });
+  s.addText("出典: ワークポート「転職活動におけるSNS・口コミの影響に関する調査」(2026年6月発表・有効回答308人)/エン・ジャパン『エン転職』ユーザーアンケート(2024年2月発表・有効回答4,513名)。詳細は別添「求職者は、求人票だけで応募を決めていない」参照。", { x: 0.6, y: 6.65, w: 12.15, h: 0.5, fontFace: JP, fontSize: 8.5, color: GRAY, margin: 0 });
+}
+
+// ============ 17. 発信プラン(3) コンテンツ例 ============
+{
+  const s = pres.addSlide();
+  titleSlide(s, 17, "情報発信プラン ─ 共感・安心・安定", "透明性向上の鍵はHP・SNS(特にInstagram)での発信。3つの感情に訴求するコンテンツを継続投稿します");
   const pillars = [
     ["共感", "「この会社、わかってくれそう」", [
       "社員の転職ストーリー(前職は残業100時間超→今は17時帰宅、など実話ベース)",
@@ -584,10 +616,10 @@ function statCard(slide, x, y, w, h, big, label, sub, accent) {
   s.addText("※ いずれも社員インタビュー・9ヶ月の運用で収集済みの実素材から制作可能。撮り下ろしゼロでも開始できます。", { x: 0.6, y: 6.55, w: 12, h: 0.4, fontFace: JP, fontSize: 10.5, color: GRAY, margin: 0 });
 }
 
-// ============ 17. 発信プラン(3) 運用・事例 ============
+// ============ 18. 発信プラン(4) 運用・事例 ============
 {
   const s = pres.addSlide();
-  titleSlide(s, 17, "発信の運用設計と成功事例", "媒体ごとに役割を分け、社長が無理なく続けられる形で運用します");
+  titleSlide(s, 18, "発信の運用設計と成功事例", "媒体ごとに役割を分け、社長が無理なく続けられる形で運用します");
   // 左: 媒体の役割分担
   s.addText("媒体の役割分担", { x: 0.6, y: 1.75, w: 6, h: 0.4, fontFace: JP, fontSize: 14, bold: true, color: NAVY, margin: 0 });
   const roles = [
@@ -627,14 +659,14 @@ function statCard(slide, x, y, w, h, big, label, sub, accent) {
   s.addShape("roundRect", { x: 0.6, y: 6.35, w: 12.15, h: 0.78, rectRadius: 0.08, fill: { color: NAVY } });
   s.addText([
     { text: "効果の測り方: ", options: { bold: true, color: ORANGE } },
-    { text: "「Instagramプロフィール到達 → HP遷移 → 説明会予約」の連鎖をKPIとして毎週計測(GA4・コンバージョン計測の整備とセット)。投稿の反応を見てテーマ配分を月次で調整します。", options: { color: "CADCFC" } },
+    { text: "「Instagramプロフィール到達 → HP遷移 → 説明会予約」の連鎖をKPIとして毎週計測(GA4・コンバージョン計測の整備とセット)。投稿の反応を見てテーマ配分を月次で調整。求人票・HP・SNS・説明会で情報が食い違わない「整合性チェック」も併せて実施します。", options: { color: "CADCFC" } },
   ], { x: 0.85, y: 6.45, w: 11.7, h: 0.6, fontFace: JP, fontSize: 10.5, margin: 0, valign: "middle" });
 }
 
-// ============ 18. 課題③詳細 ============
+// ============ 19. 課題③詳細 ============
 {
   const s = pres.addSlide();
-  titleSlide(s, 18, "課題③ 求職者との直接接点の不足", "情報の不透明性を補う最短ルートは「直接会って話す」こと ─ 集客は他社の力を借りる");
+  titleSlide(s, 19, "課題③ 求職者との直接接点の不足", "情報の不透明性を補う最短ルートは「直接会って話す」こと ─ 集客は他社の力を借りる");
   // 左: 自社集客の実績
   s.addText("自社集客イベントの実績", { x: 0.6, y: 1.75, w: 6, h: 0.4, fontFace: JP, fontSize: 14, bold: true, color: NAVY, margin: 0 });
   const own = [
@@ -673,10 +705,10 @@ function statCard(slide, x, y, w, h, big, label, sub, accent) {
   s.addText("※ 説明会は「集客の場」から「クロージングの場」へ役割を再定義。出会いは外部で、深い相互理解は自社の説明会で。", { x: 7.1, y: 6.5, w: 5.65, h: 0.6, fontFace: JP, fontSize: 10, color: GRAY, margin: 0 });
 }
 
-// ============ 19. 今後の提言 ============
+// ============ 20. 今後の提言 ============
 {
   const s = pres.addSlide();
-  titleSlide(s, 19, "今後のご提言 ─ 3つの課題に対応する打ち手", "8月以降の転職市場再活性化(ピーク:9〜10月)を最大限に活かすために");
+  titleSlide(s, 20, "今後のご提言 ─ 3つの課題に対応する打ち手", "8月以降の転職市場再活性化(ピーク:9〜10月)を最大限に活かすために");
   const recs = [
     ["1", "採用HPリニューアル+Instagramで「情報の透明性」を確保", "「働き方・業務内容・どんな人が働いているか」を軸に発信を強化。リニューアルHP(お盆前完了予定)とInstagramを紐付け、求人から裏付けを取りに来た求職者が必ず情報に辿り着ける状態をつくる", "課題②"],
     ["2", "他社集客型イベントで求職者と直接交流", "ハローワーク説明会(8/28以降予約可)と、マイナビ転職フェア富山(10月・1月、20〜30代来場中心)等の合同説明会に参加。自社集客に依存せず、対面交流で情報不足への不安を解消する", "課題③"],
@@ -697,16 +729,17 @@ function statCard(slide, x, y, w, h, big, label, sub, accent) {
   });
 }
 
-// ============ 20. 実行ロードマップ ============
+// ============ 21. 実行ロードマップ ============
 {
   const s = pres.addSlide();
-  titleSlide(s, 20, "実行ロードマップ(2026年8月〜)", "市場ピーク(9〜10月)に間に合わせる時系列プラン");
+  titleSlide(s, 21, "実行ロードマップ(2026年8月〜)", "市場ピーク(9〜10月)に間に合わせる時系列プラン");
   const cols = [
     ["8月", "土台を仕上げる", [
       "採用HPリニューアル完了(お盆前)・Instagram連携",
       "Instagram定期投稿の開始(共感・安心・安定の3テーマ)",
       "ハローワーク説明会の予約(8/28以降の枠)",
       "SMS→LINEの連絡フローを全応募者に標準化",
+      "採用情報の整合性チェック(求人票・HP・SNS・説明会)",
     ], ORANGE],
     ["9月", "接点を仕込む", [
       "マイナビ転職フェア出展の可否判断(費用交渉の結果を反映)",
@@ -735,10 +768,10 @@ function statCard(slide, x, y, w, h, big, label, sub, accent) {
   });
 }
 
-// ============ 21. 会議・活動履歴 ============
+// ============ 22. 会議・活動履歴 ============
 {
   const s = pres.addSlide();
-  titleSlide(s, 21, "活動履歴 ─ 定例ミーティング・説明会", "毎回議事録を共有し、決定事項を翌週までに実行するサイクルを継続");
+  titleSlide(s, 22, "活動履歴 ─ 定例ミーティング・説明会", "毎回議事録を共有し、決定事項を翌週までに実行するサイクルを継続");
   const left = [
     ["11/20", "初回面談"],
     ["12/5", "キックオフ(富山ご訪問)"],
