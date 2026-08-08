@@ -647,14 +647,46 @@ S_honest = '''
 
 # 新しい並び: hero → ABEMA → 面接じゃない → 給与 → 【フォーム】 → 1日 → 成長 → 人 → 正直 → 当日の流れ → 開催概要 → 社長 → footer
 body = '\n'.join([
-    S_hero, S_abema, S_nointv,
-    S_pay,          # 給与を前倒し(応募判断で最も見られる情報)
-    S_form,         # フォームを約35%地点へ
-    S_day, S_growth, S_people, S_honest,   # 透明性コンテンツ
-    S_flow, S_event,
-    S_ceo,
+    # ① 会社見学の案内 ─ まずは見学予約へ誘導する
+    S_hero,      # AIに代えられるか + 見学の概要 + CTA
+    S_nointv,    # これは「面接」じゃありません(参加ハードルを下げる)
+    S_flow,      # 当日の流れ(見学で何をするか)
+    S_event,     # 開催概要(日時・場所・持ち物・服装)
+    S_form,      # 予約フォーム ← 見学ブロックの締め
+    # ② 求職者にとってのメリット
+    S_pay,       # 給与・待遇(数字で全部出す)
+    S_day,       # 仕事の1日(17時退社の実態)
+    S_growth,    # 未経験からの成長ステップ
+    S_honest,    # 正直に言うと、大変なこと(両面開示)+CTA
+    S_people,    # 働く人・社員の声
+    # ③ 会社について
+    S_abema,     # ABEMA出演(メディア実績)
+    S_ceo,       # 社長メッセージ + X
 ])
 d = head + '\n' + body + '\n' + tail
+
+# ── 修正4b: 並び替えでズレたセクション背景を連続させる ─────────────────────
+# 各セクションの終了色と次セクションの開始色を一致させ、境界の段差をなくす
+# (ヒーローは終端が --bg-main なので、そこから main↔second を交互に繋ぐ。
+#  末尾はフッターの --bg-second に接続する)
+sec_iter = list(re.finditer(r'^<section\b[^>]*>', d, re.M))
+chain = ['var(--bg-main)', 'var(--bg-second)']
+out, prev_end, idx = [], 0, 0
+for m in sec_iter[1:]:                      # ヒーロー(先頭)は既存のままにする
+    tag = m.group(0)
+    if 'style="background:' not in tag:
+        continue
+    start = chain[idx % 2]
+    end   = chain[(idx + 1) % 2]
+    new_tag = re.sub(r'background:[^;"]*;?',
+                     f'background: linear-gradient(180deg, {start} 0%, {end} 100%);',
+                     tag, count=1)
+    out.append(d[prev_end:m.start()]); out.append(new_tag)
+    prev_end = m.end(); idx += 1
+out.append(d[prev_end:])
+d = ''.join(out)
+print(f'背景を連続化したセクション: {idx}個 / 末尾の色: {chain[idx % 2]}')
+
 
 # ── 検証 ────────────────────────────────────────────────────────────
 assert d.count('id="reserve"') == 1, '#reserve が重複/欠落'
