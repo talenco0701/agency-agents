@@ -212,6 +212,188 @@ rep('  .form-error {',
   }
   .form-error {''', label='optional css')
 
+# ── 修正3b: ヒーローのイベントパネル/CTAの見栄え・視認性を改善 ───────────
+# (1) 3項目を等幅3カラム化し、上端を揃える。区切りは左ボーダーで表現
+old_panel = '''      <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
+        <div>
+          <div class="font-mono text-xs mb-1" style="color: var(--text-sub);">DATE</div>
+          <div class="font-display text-xl sm:text-2xl font-bold neon-cyan leading-tight">随時 <span class="text-sm">受付中</span></div>
+          <div class="font-mono text-xs mt-1" style="color: var(--text-sub);">// ご都合に合わせて調整します</div>
+        </div>
+        <div class="hidden sm:block w-px h-12" style="background: var(--border);"></div>
+        <div>
+          <div class="font-mono text-xs mb-1" style="color: var(--text-sub);">TIME</div>
+          <div class="font-mono text-base font-bold">平日夜 18:00〜 / 日中も可</div>
+          <div class="font-mono text-xs mt-1" style="color: var(--text-sub);">// 1対1の個別開催・約45分</div>
+        </div>
+        <div class="hidden sm:block w-px h-12" style="background: var(--border);"></div>
+        <div>
+          <div class="font-mono text-xs mb-1" style="color: var(--text-sub);">PLACE</div>
+          <div class="font-mono text-base font-bold">オンライン（Zoom）</div>
+        </div>
+      </div>'''
+
+new_panel = '''      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 hero-info-grid">
+        <div class="hero-info-col">
+          <div class="hero-info-label">DATE</div>
+          <div class="hero-info-value neon-cyan">随時 受付中</div>
+          <div class="hero-info-note">ご都合に合わせて日程を調整します</div>
+        </div>
+        <div class="hero-info-col">
+          <div class="hero-info-label">TIME</div>
+          <div class="hero-info-value">平日夜 18:00〜<span class="hero-info-value-sub">／日中も可</span></div>
+          <div class="hero-info-note">1対1の個別開催・約45分</div>
+        </div>
+        <div class="hero-info-col">
+          <div class="hero-info-label">PLACE</div>
+          <div class="hero-info-value">オンライン（Zoom）</div>
+          <div class="hero-info-note">スマホ・PCどちらでも参加できます</div>
+        </div>
+      </div>'''
+rep(old_panel, new_panel, label='hero info panel')
+
+# (2) ヒーローCTAを中央揃えに(上のサブコピーが中央のため左寄せだと崩れて見える)
+rep('''<p class="text-center text-sm neon-lime mb-3">日程はご都合に合わせます／オンライン参加OK／これは「面接」ではありません</p><a href="#reserve" class="btn-neon btn-cta-lg" data-ga-event="cta_click" data-ga-label="hero">
+        ▶ 説明会を予約する
+      </a>''',
+'''<p class="text-center text-sm neon-lime mb-3">日程はご都合に合わせます／オンライン参加OK／これは「面接」ではありません</p>
+      <div style="text-align:center;"><a href="#reserve" class="btn-neon btn-cta-lg" data-ga-event="cta_click" data-ga-label="hero">
+        ▶ 説明会を予約する
+      </a></div>''', label='hero CTA center')
+
+# (3) ヒーロー下部のバッジ群も中央揃えに揃える
+rep('<div class="mt-6 flex flex-wrap gap-2">',
+    '<div class="mt-6 flex flex-wrap gap-2 justify-center">', label='hero badges center')
+
+# (4) 上記クラスのCSSを追加(視認性: ラベル/補足の明度とサイズを引き上げ)
+rep('  .form-optional {',
+    '''  /* ヒーロー イベント情報パネル */
+  .hero-info-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    color: var(--neon-cyan);
+    opacity: 0.85;
+    margin-bottom: 0.5rem;
+  }
+  .hero-info-value {
+    font-family: 'JetBrains Mono', 'Noto Sans JP', monospace;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.4;
+  }
+  .hero-info-value.neon-cyan { color: var(--neon-cyan); }
+  .hero-info-value-sub { font-size: 0.85em; font-weight: 500; opacity: 0.85; }
+  .hero-info-note {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: #A9B6CC;
+  }
+  @media (min-width: 640px) {
+    .hero-info-grid { gap: 0; }
+    .hero-info-col { padding: 0 1.75rem; }
+    .hero-info-col:first-child { padding-left: 0; }
+    .hero-info-col + .hero-info-col { border-left: 1px solid var(--border); }
+  }
+  .form-optional {''', label='hero panel css')
+
+# ── 修正3c: オンライン説明会 → 対面の会社見学 へ全面変更 ─────────────────
+# 開催概要テーブル(オンライン前提の項目を対面用に差し替え)
+rep('''          <tr><th>時間帯</th><td><span class="font-bold">18:00 ／ 18:30 ／ 19:00 スタート</span><span class="font-mono text-xs ml-2" style="color: var(--text-sub);">(各 約45分)</span><br><span class="font-mono text-xs" style="color: var(--text-sub);">// 好きな時間帯をお選びください</span></td></tr>
+          <tr><th>形式</th><td>オンライン（Zoom）<br><span style="color: var(--text-sub);">オンラインミーティングURLは予約確認メールでお送りします</span></td></tr>
+          <tr><th>参加方法</th><td>顔出し不要・音声のみでOK<br><span style="color: var(--text-sub);">スマホ・PC・タブレットあいずれかで参加可</span></td></tr>
+          <tr><th>こんな方も</th><td>仕事帰りの車の中からでもOK<br><span style="color: var(--text-sub);">気軽にご参加ください</span></td></tr>
+          <tr><th>服装</th><td>何でもOK（カメラOFF）</td></tr>''',
+'''          <tr><th>時間帯</th><td><span class="font-bold">平日の日中・夕方／土曜も相談可</span><span class="font-mono text-xs ml-2" style="color: var(--text-sub);">(所要 約45分)</span><br><span class="font-mono text-xs" style="color: var(--text-sub);">// ご都合の良い時間をお知らせください</span></td></tr>
+          <tr><th>形式</th><td>対面での会社見学（1対1）<br><span style="color: var(--text-sub);">実際の職場・資材・機器を、その場でご覧いただけます</span></td></tr>
+          <tr><th>場所</th><td>株式会社 松下工業 本社<br><span style="color: var(--text-sub);">富山県富山市中島3-4-20／駐車場あり・お車でお越しいただけます</span></td></tr>
+          <tr><th>持ち物</th><td>手ぶらでOK<br><span style="color: var(--text-sub);">履歴書も筆記用具も必要ありません</span></td></tr>
+          <tr><th>服装</th><td>私服でOK<br><span style="color: var(--text-sub);">スーツも作業着も必要ありません</span></td></tr>
+          <tr><th>こんな方も</th><td>ご家族・ご友人とご一緒でもOK<br><span style="color: var(--text-sub);">「まず職場を見てみたい」だけで大歓迎です</span></td></tr>''',
+    label='event table → 対面')
+
+rep('<tr><th>開催日</th><td>', '<tr><th>見学日</th><td>', label='event table 見学日')
+
+# 参加までの流れ(オンライン参加 → 来社)
+rep('''      <!-- オンライン参加案内 -->''', '''      <!-- 見学までの流れ -->''', label='howto comment')
+rep('<div class="term-label">HOW_TO_JOIN.online</div>', '<div class="term-label">HOW_TO_JOIN.visit</div>', label='howto label')
+rep('''              <div class="font-bold mb-1">オンラインミーティングURLをメールで受け取る</div>
+              <p class="text-sm" style="color: var(--text-sub);">ご予約後、担当者からオンラインミーティングURLをお送りします。</p>''',
+'''              <div class="font-bold mb-1">担当者と見学日を決める</div>
+              <p class="text-sm" style="color: var(--text-sub);">ご予約後、担当者からご連絡します。ご都合に合わせて日時を決めましょう。</p>''',
+    label='howto 02')
+rep('''              <div class="font-bold mb-1">当日、URLをタップするだけ</div>
+              <p class="text-sm" style="color: var(--text-sub);">顔出し不要。音声のみでOK。仕事帰りの車内からでも参加できます。</p>''',
+'''              <div class="font-bold mb-1">当日、本社にお越しください</div>
+              <p class="text-sm" style="color: var(--text-sub);">私服・手ぶらでOK。駐車場がありますので、お車でお越しいただけます。</p>''',
+    label='howto 03')
+
+# 当日の流れ STEP02(画面共有 → 実物を見てもらう)
+rep('会社・仕事紹介（画面共有）', '会社・職場のご案内', label='step02 title')
+rep('スライドや写真で仕事内容・社内の雰囲気をご紹介。実際に使う資材・機器も画像でお見せします。',
+    '実際の職場をご案内します。普段使っている資材や機器も、その場で手に取ってご覧いただけます。', label='step02 body')
+
+# ヒーローパネル(場所・時間)
+rep('''          <div class="hero-info-value">平日夜 18:00〜<span class="hero-info-value-sub">／日中も可</span></div>
+          <div class="hero-info-note">1対1の個別開催・約45分</div>''',
+'''          <div class="hero-info-value">平日の日中・夕方<span class="hero-info-value-sub">／土曜も相談可</span></div>
+          <div class="hero-info-note">1対1でご案内・所要 約45分</div>''', label='hero TIME 対面')
+rep('''          <div class="hero-info-value">オンライン（Zoom）</div>
+          <div class="hero-info-note">スマホ・PCどちらでも参加できます</div>''',
+'''          <div class="hero-info-value">富山市中島 3-4-20</div>
+          <div class="hero-info-note">松下工業 本社／駐車場あり・お車でお越しいただけます</div>''', label='hero PLACE 対面')
+
+# ヒーローのバッジ・サブコピー
+rep('日程はご都合に合わせます／オンライン参加OK／これは「面接」ではありません',
+    '日程はご都合に合わせます／私服・手ぶらでOK／これは「面接」ではありません', label='hero microcopy 対面')
+rep('<span class="badge badge-lime">顔出し 不要</span>', '<span class="badge badge-lime">私服 でOK</span>', label='badge 顔出し')
+rep('<span class="badge badge-lime">音声のみ OK</span>', '<span class="badge badge-lime">手ぶら でOK</span>', label='badge 音声のみ')
+rep('<span class="badge badge-lime">仕事帰り・車内から OK</span>', '<span class="badge badge-lime">家族・友人の同伴 OK</span>', label='badge 車内')
+
+# フォーム周辺
+rep('&gt; 顔出し不要・音声のみOK / 履歴書不要・日程は後から調整OK',
+    '&gt; 私服・手ぶらでOK / 履歴書不要・日程は後から調整OK', label='submit microcopy 対面')
+rep('担当者より、オンラインミーティングURLを', '担当者より、見学日時のご相談を', label='thanks 対面')
+
+# メタ情報(og:title は「会社説明会（オンライン）」表記を含むため先に処理)
+rep('<meta property="og:title" content="その仕事、AIでいいがないけ。｜株式会社松下工業 会社説明会（オンライン）"',
+    '<meta property="og:title" content="その仕事、AIでいいがないけ。｜株式会社松下工業 個別の会社見学"', label='og title 対面')
+rep('その仕事、AIでいいがないけ。｜株式会社松下工業 オンライン個別説明会（日程はご都合に合わせて調整）',
+    'その仕事、AIでいいがないけ。｜株式会社松下工業 個別の会社見学（日程はご都合に合わせて調整）', label='title 対面')
+rep('富山市のライフラインを支える配管技術者。AIに代えられない技術を、未経験から。オンライン個別説明会は日程調整制・随時受付。顔出し不要・履歴書不要・仕事帰りOK。',
+    '富山市のライフラインを支える配管技術者。AIに代えられない技術を、未経験から。1対1の会社見学を随時受付中（日程は個別調整）。私服・手ぶら・履歴書不要。',
+    label='meta desc 対面')
+rep('富山市のライフラインを支える配管技術者。AIに代えられない技術を、未経験から。オンライン個別説明会は日程調整制・随時受付。顔出し不要・仕事帰りでも参加OK。',
+    '富山市のライフラインを支える配管技術者。AIに代えられない技術を、未経験から。1対1の会社見学を随時受付中（日程は個別調整）。私服・手ぶらでOK。',
+    label='og desc 対面')
+rep('オンライン個別説明会 ／ 日程は個別調整・随時受付',
+    '1対1の会社見学 ／ 日程は個別調整・随時受付', label='hero badge 対面')
+rep('● ONLINE', '● 見学 受付中', label='hero ONLINE badge')
+
+# 呼称を「説明会」→「会社見学」に統一
+d = d.replace('説明会', '会社見学')
+assert 'オンライン会社見学' not in d and 'Zoom' not in d, 'オンライン前提の表記が残存'
+
+# ── 修正3d: 視認性の底上げ(透明性コンテンツを読ませるため) ────────────────
+# 本文色を明るく・日本語向けに行間を広げる。既存ルールを上書きするため末尾に追加。
+legibility_css = '''
+  /* ===== 視認性の改善（情報の透明性を伝えるための可読性強化） ===== */
+  :root { --text-sub: #A9B6CC; }
+  .text-sm  { line-height: 1.75rem; }
+  .text-base{ line-height: 1.9rem; }
+  .text-lg  { line-height: 2.05rem; }
+  p { line-height: 1.9; }
+  .spec-table { font-size: 1rem; }
+  .spec-table th, .spec-table td { padding: 1.05rem 1rem; line-height: 1.8; }
+  .spec-table th { color: var(--neon-cyan); font-weight: 700; }
+  .card p { color: #C2CDDD; }
+  .term-label { letter-spacing: 0.12em; }
+'''
+i_style_end = d.rindex('</style>')
+d = d[:i_style_end] + legibility_css + d[i_style_end:]
+
 # ── 修正4: セクション並び替え + 透明性コンテンツの追加 ───────────────────
 # トップレベル(行頭)の <section>...</section> を動的に抽出する
 sec_re = re.compile(r'^<section\b.*?^</section>', re.S | re.M)
@@ -454,10 +636,10 @@ S_honest = '''
 
     <p class="text-base sm:text-lg mt-10 text-center" style="color: var(--text-main);">
       ここまで読んで「思ったよりキツくないな」と感じた方も、「やっぱり大変そう」と感じた方も、<br class="hidden sm:block">
-      <span class="neon-lime font-bold">まずは説明会で、直接聞いてください。</span>
+      <span class="neon-lime font-bold">まずは会社見学で、直接聞いてください。</span>
     </p>
     <div class="text-center mt-6">
-      <a href="#reserve" class="btn-neon btn-cta-lg" data-ga-event="cta_click" data-ga-label="after_honest">▶ 説明会を予約する</a>
+      <a href="#reserve" class="btn-neon btn-cta-lg" data-ga-event="cta_click" data-ga-label="after_honest">▶ 会社見学を予約する</a>
     </div>
   </div>
 </section>
