@@ -394,6 +394,66 @@ legibility_css = '''
 i_style_end = d.rindex('</style>')
 d = d[:i_style_end] + legibility_css + d[i_style_end:]
 
+# ── 修正3e: コンバージョン計測の是正 ──────────────────────────────────
+# (1) CTAクリックの擬似コンバージョンを lead_submit から分離する。
+#     旧Googleフォーム時代の名残で「ボタンを押しただけ」でCVが立っていた。
+#     実フォーム送信(handleSuccess)だけが lead_submit を発火するようにする。
+rep("""    // CTAクリック=Lead(擬似コンバージョン)として別イベントもpush
+    // ※Googleフォーム送信完了は計測できないため、ボタンクリック=Leadとして扱う
+    // ※GTM側でこのイベントを拾ってMeta Pixel Lead/GA4 generate_leadを発火させる
+    if (eventName === 'cta_click') {
+      track('lead_submit', {
+        lead_source: label || 'unknown',
+        lead_type: 'briefing_reservation_cta'
+      });
+    }""",
+"""    // CTAクリックは「意向」であって予約完了ではないため、コンバージョン(lead_submit)とは
+    // 別イベントで送る。lead_submit は予約フォームの送信成功時のみ発火する。
+    // ※GTM側では lead_submit（＝実際の予約）をコンバージョンに設定してください。
+    if (eventName === 'cta_click') {
+      track('cta_lead_intent', {
+        event_category: 'engagement',
+        lead_source: label || 'unknown',
+        lead_type: 'briefing_reservation_cta'
+      });
+    }
+
+    // LINEは他のCTAと性質が異なる(友だち追加導線)ため単独で評価できるようにする
+    if (label === 'hero_line' || label === 'floating_line') {
+      track('line_click', {
+        event_category: 'engagement',
+        event_label: label
+      });
+    }""", label='CV分離')
+
+# (2) 送信失敗時の取りこぼし防止:
+#     GASへのPOSTが失敗しても予約自体は保存されているケースがあるため、
+#     送信を試みた時点でも別イベントを残す(GTMでのCVには使わず、突合用)。
+rep("""    // 送信開始
+    submitBtn.disabled = true;""",
+"""    // 送信を試みた時点の記録(GAS側に保存されたのに通信エラーになるケースの突合用)
+    track('form_submit_attempt', {
+      event_category: 'form',
+      event_label: 'reserve_form'
+    });
+
+    // 送信開始
+    submitBtn.disabled = true;""", label='送信試行イベント')
+
+# (3) エラー文の電話番号を tel: リンク化して計測する(スマホでタップ発信できるようにする)
+rep('⚠ 送信に失敗しました。お手数ですが時間をおいて再度お試しいただくか、お電話(076-433-2040)でお問い合わせください。',
+    '⚠ 送信に失敗しました。お手数ですが時間をおいて再度お試しいただくか、'
+    '<a href="tel:0764332040" data-ga-event="call_click" data-ga-label="form_error" '
+    'style="color:var(--neon-cyan);text-decoration:underline;">076-433-2040</a> へお電話ください。',
+    label='tel リンク(エラー時)')
+
+# (4) 常時表示のLINEボタンが未計測だったため計測タグを付与する
+rep("""<a href="https://lin.ee/T719ae9" target="_blank" rel="noopener"
+   style="position:fixed;right:20px;bottom:24px;""",
+"""<a href="https://lin.ee/T719ae9" target="_blank" rel="noopener"
+   data-ga-event="cta_click" data-ga-label="floating_line"
+   style="position:fixed;right:20px;bottom:24px;""", label='floating LINE 計測')
+
 # ── 修正4: セクション並び替え + 透明性コンテンツの追加 ───────────────────
 # トップレベル(行頭)の <section>...</section> を動的に抽出する
 sec_re = re.compile(r'^<section\b.*?^</section>', re.S | re.M)
