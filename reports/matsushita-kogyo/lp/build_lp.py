@@ -1,0 +1,769 @@
+#!/usr/bin/env python3
+"""松下工業様 採用LP 修正版ビルダー
+元: lp/mkc.recruit-hub-ta.com/index.html → 出力: lp_out/index.html
+"""
+import re, sys, pathlib
+
+SRC = pathlib.Path('lp/mkc.recruit-hub-ta.com/index.html')
+OUT = pathlib.Path('lp_out/index.html')
+OUT.parent.mkdir(exist_ok=True)
+
+raw = SRC.read_bytes()
+
+# ── 修正1: nullバイトで破損した @keyframes を復元 (@pulse-glow / @fade-up / @spin-slow)
+n_null = raw.count(b'\x00')
+d = raw.replace(b'\x00', b'@').decode('utf-8')
+assert n_null == 3, f'想定外のnullバイト数: {n_null}'
+
+def rep(old, new, times=1, label=''):
+    global d
+    c = d.count(old)
+    assert c == times, f'[{label}] 出現回数 {c} (期待 {times}): {old[:60]!r}'
+    d = d.replace(old, new)
+
+# ── 修正2: 固定日程(毎週木曜)→ 個別説明会・随時日程調整 ───────────────────
+rep('<title>その仕事、AIでいいがないけ。｜株式会社松下工業 会社説明会（オンライン）毎週木曜開催</title>',
+    '<title>その仕事、AIでいいがないけ。｜株式会社松下工業 オンライン個別説明会（日程はご都合に合わせて調整）</title>',
+    label='title')
+
+rep('富山市のライフラインを支える配管技術者。AIに代えられない技術を、未経験から。毎週木曜18:00〜 オンライン個別説明会開催。顔出し不要・仕事帰りOK・前日までに予約。',
+    '富山市のライフラインを支える配管技術者。AIに代えられない技術を、未経験から。オンライン個別説明会は日程調整制・随時受付。顔出し不要・履歴書不要・仕事帰りOK。',
+    label='meta desc')
+
+rep('富山市のライフラインを支える配管技術者。AIに代えられない技術を、未経験から。毎週木曜オンライン個別説明会。顔出し不要・仕事帰りでも参加OK。',
+    '富山市のライフラインを支える配管技術者。AIに代えられない技術を、未経験から。オンライン個別説明会は日程調整制・随時受付。顔出し不要・仕事帰りでも参加OK。',
+    label='og desc')
+
+# ヒーロー: イベント情報パネル
+rep('<span class="font-bold text-base" style="color:var(--text-main);">オンライン個別説明会 ／ 毎週木曜開催</span>',
+    '<span class="font-bold text-base" style="color:var(--text-main);">オンライン個別説明会 ／ 日程は個別調整・随時受付</span>',
+    label='hero badge')
+
+rep('''          <div class="font-mono text-xs mb-1" style="color: var(--text-sub);">DATE</div>
+          <div class="font-display text-xl sm:text-2xl font-bold neon-cyan leading-tight">毎週 <span class="text-sm">木曜日</span></div>''',
+    '''          <div class="font-mono text-xs mb-1" style="color: var(--text-sub);">DATE</div>
+          <div class="font-display text-xl sm:text-2xl font-bold neon-cyan leading-tight">随時 <span class="text-sm">受付中</span></div>
+          <div class="font-mono text-xs mt-1" style="color: var(--text-sub);">// ご都合に合わせて調整します</div>''',
+    label='hero DATE')
+
+rep('''          <div class="font-mono text-xs mb-1" style="color: var(--text-sub);">TIME</div>
+          <div class="font-mono text-base font-bold">18:00 / 18:30 / 19:00</div>
+          <div class="font-mono text-xs mt-1" style="color: var(--text-sub);">// 個別開催・事前予約制</div>''',
+    '''          <div class="font-mono text-xs mb-1" style="color: var(--text-sub);">TIME</div>
+          <div class="font-mono text-base font-bold">平日夜 18:00〜 / 日中も可</div>
+          <div class="font-mono text-xs mt-1" style="color: var(--text-sub);">// 1対1の個別開催・約45分</div>''',
+    label='hero TIME')
+
+rep('<p class="text-center text-sm neon-lime mb-3">毎週木曜開催／オンライン参加OK／これは「面接」ではありません</p>',
+    '<p class="text-center text-sm neon-lime mb-3">日程はご都合に合わせます／オンライン参加OK／これは「面接」ではありません</p>',
+    label='hero CTA microcopy')
+
+# 開催概要セクション
+rep('<span class="font-mono text-base sm:text-xl neon-cyan">// 毎週木曜 開催</span>',
+    '<span class="font-mono text-base sm:text-xl neon-cyan">// 個別開催・随時受付</span>',
+    label='event heading')
+
+rep('''<div><span class="font-mono text-xs neon-cyan">[DATE]</span> <span class="font-bold neon-cyan">毎週木曜日</span></div>''',
+    '''<div><span class="font-mono text-xs neon-cyan">[DATE]</span> <span class="font-bold neon-cyan">随時（個別に日程調整）</span></div>''',
+    label='event date')
+
+rep('<div class="mt-2 font-mono text-xs" style="color: var(--text-sub);">// 前日までに要予約（個別開催）</div>',
+    '<div class="mt-2 font-mono text-xs" style="color: var(--text-sub);">// ご予約後、担当者がご希望を伺って日程を決めます</div>',
+    label='event date note')
+
+rep('<p class="text-sm" style="color: var(--text-sub);">希望日（木曜）と時間帯を選んで送信。前日までに受付。</p>',
+    '<p class="text-sm" style="color: var(--text-sub);">ご希望の曜日・時間帯を選んで送信するだけ。日程は後から調整できます。</p>',
+    label='howto step01')
+
+rep('下記フォームよりお申し込みください。<br>毎週木曜開催・<span class="neon-cyan">前日までに要予約</span>。送信後、担当者よりオンラインミーティングURLをお送りします。',
+    '下記フォームよりお申し込みください。<br><span class="neon-cyan">日程はご都合に合わせて個別に調整</span>します。送信後、担当者よりご連絡いたします。',
+    label='form intro')
+
+rep('<span style="color: var(--text-sub); font-size: 0.9em;">※ 前日までにお申し込みの方に順次ご連絡します</span>',
+    '<span style="color: var(--text-sub); font-size: 0.9em;">※ 担当者より日程調整のご連絡をいたします</span>',
+    label='thanks note')
+
+rep('&gt; 顔出し不要・音声のみOK / 前日17:00までに予約',
+    '&gt; 顔出し不要・音声のみOK / 履歴書不要・日程は後から調整OK',
+    label='submit microcopy')
+
+# ── 修正3: 予約フォームの日程欄(過去日付の固定リスト)を「希望の曜日/時間帯」に置換 ──
+old_date_time = '''          <!-- 希望日程 -->
+          <div class="form-field" data-field="date">
+            <label class="form-label" for="rf-date">
+              &gt; SELECT date
+              <span class="form-label-jp">希望日程（木曜日）</span>
+              <span class="form-required">必須</span>
+            </label>
+            <select id="rf-date" name="date" class="form-select" required>
+              <option value="">-- 希望の木曜日を選択してください --</option>
+              <option value="7月9日（木）">7月9日（木）</option>
+              <option value="7月16日（木）">7月16日（木）</option>
+              <option value="7月23日（木）">7月23日（木）</option>
+              <option value="7月30日（木）">7月30日（木）</option>
+              <option value="8月6日（木）">8月6日（木）</option>
+              <option value="8月13日（木）">8月13日（木）</option>
+              <option value="8月20日（木）">8月20日（木）</option>
+              <option value="8月27日（木）">8月27日（木）</option>
+            </select>
+            <div class="form-error">! 希望日程を選択してください</div>
+          </div>
+
+          <!-- 希望時間帯 -->
+          <div class="form-field" data-field="time">
+            <label class="form-label" for="rf-time">
+              &gt; SELECT time
+              <span class="form-label-jp">希望時間帯</span>
+              <span class="form-required">必須</span>
+            </label>
+            <select id="rf-time" name="time" class="form-select" required>
+              <option value="">-- 選択してください --</option>
+              <option value="18:00">18:00〜（約45分）</option>
+              <option value="18:30">18:30〜（約45分）</option>
+              <option value="19:00">19:00〜（約45分）</option>
+            </select>
+            <div class="form-error">! 希望時間帯を選択してください</div>
+          </div>
+'''
+
+new_date_time = '''          <!-- 希望の曜日（name="date" はGAS側の項目名に合わせて維持） -->
+          <div class="form-field" data-field="date">
+            <label class="form-label" for="rf-date">
+              &gt; SELECT day
+              <span class="form-label-jp">ご希望の曜日</span>
+              <span class="form-required">必須</span>
+            </label>
+            <select id="rf-date" name="date" class="form-select" required>
+              <option value="">-- 選択してください --</option>
+              <option value="平日">平日（月〜金）</option>
+              <option value="土曜">土曜日</option>
+              <option value="日曜・祝日">日曜・祝日</option>
+              <option value="いつでも可">いつでも可・相談したい</option>
+            </select>
+            <div class="form-error">! ご希望の曜日を選択してください</div>
+          </div>
+
+          <!-- 希望の時間帯（name="time" 維持） -->
+          <div class="form-field" data-field="time">
+            <label class="form-label" for="rf-time">
+              &gt; SELECT time
+              <span class="form-label-jp">ご希望の時間帯</span>
+              <span class="form-required">必須</span>
+            </label>
+            <select id="rf-time" name="time" class="form-select" required>
+              <option value="">-- 選択してください --</option>
+              <option value="18:00〜">18:00〜（仕事帰り）</option>
+              <option value="18:30〜">18:30〜（仕事帰り）</option>
+              <option value="19:00〜">19:00〜（仕事帰り）</option>
+              <option value="19:30〜">19:30〜（仕事帰り）</option>
+              <option value="日中（9:00〜17:00）">日中（9:00〜17:00）</option>
+              <option value="相談したい">相談して決めたい</option>
+            </select>
+            <div class="form-error">! ご希望の時間帯を選択してください</div>
+          </div>
+
+          <!-- 具体的な希望日時・ご質問（任意／textareaはバリデーション対象外＝任意項目） -->
+          <div class="form-field" data-field="note">
+            <label class="form-label" for="rf-note">
+              &gt; INPUT note
+              <span class="form-label-jp">具体的なご希望日時・聞きたいこと</span>
+              <span class="form-optional">任意</span>
+            </label>
+            <textarea id="rf-note" name="note" class="form-input" rows="3" placeholder="例）来週の水曜か木曜の19時以降が助かります／未経験でも本当に大丈夫か聞きたいです"></textarea>
+            <div class="form-note-hint">空欄でも大丈夫です。担当者からご希望を伺います。</div>
+          </div>
+'''
+rep(old_date_time, new_date_time, label='form date/time fields')
+
+# サンクス画面の可読化関数を新しい選択肢に合わせる
+rep('''  function readableTime(v) {
+    return v === '18:00' ? '18:00〜（約45分）'
+         : v === '18:30' ? '18:30〜（約45分）'
+         : v === '19:00' ? '19:00〜（約45分）'
+         : v || '（未選択）';
+  }''',
+    '''  function readableTime(v) {
+    return v ? v + '（約45分）' : '（未選択）';
+  }''', label='readableTime')
+
+# 任意項目ラベル/ヒント用のCSSを追加
+rep('  .form-error {',
+    '''  .form-optional {
+    display: inline-block;
+    margin-left: 0.5rem;
+    padding: 2px 8px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--text-sub);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+  }
+  .form-note-hint {
+    margin-top: 0.4rem;
+    font-size: 0.75rem;
+    color: var(--text-sub);
+  }
+  textarea.form-input {
+    resize: vertical;
+    min-height: 5.5rem;
+    font-family: inherit;
+    line-height: 1.7;
+  }
+  .form-error {''', label='optional css')
+
+# ── 修正3b: ヒーローのイベントパネル/CTAの見栄え・視認性を改善 ───────────
+# (1) 3項目を等幅3カラム化し、上端を揃える。区切りは左ボーダーで表現
+old_panel = '''      <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
+        <div>
+          <div class="font-mono text-xs mb-1" style="color: var(--text-sub);">DATE</div>
+          <div class="font-display text-xl sm:text-2xl font-bold neon-cyan leading-tight">随時 <span class="text-sm">受付中</span></div>
+          <div class="font-mono text-xs mt-1" style="color: var(--text-sub);">// ご都合に合わせて調整します</div>
+        </div>
+        <div class="hidden sm:block w-px h-12" style="background: var(--border);"></div>
+        <div>
+          <div class="font-mono text-xs mb-1" style="color: var(--text-sub);">TIME</div>
+          <div class="font-mono text-base font-bold">平日夜 18:00〜 / 日中も可</div>
+          <div class="font-mono text-xs mt-1" style="color: var(--text-sub);">// 1対1の個別開催・約45分</div>
+        </div>
+        <div class="hidden sm:block w-px h-12" style="background: var(--border);"></div>
+        <div>
+          <div class="font-mono text-xs mb-1" style="color: var(--text-sub);">PLACE</div>
+          <div class="font-mono text-base font-bold">オンライン（Zoom）</div>
+        </div>
+      </div>'''
+
+new_panel = '''      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 hero-info-grid">
+        <div class="hero-info-col">
+          <div class="hero-info-label">DATE</div>
+          <div class="hero-info-value neon-cyan">随時 受付中</div>
+          <div class="hero-info-note">ご都合に合わせて日程を調整します</div>
+        </div>
+        <div class="hero-info-col">
+          <div class="hero-info-label">TIME</div>
+          <div class="hero-info-value">平日夜 18:00〜<span class="hero-info-value-sub">／日中も可</span></div>
+          <div class="hero-info-note">1対1の個別開催・約45分</div>
+        </div>
+        <div class="hero-info-col">
+          <div class="hero-info-label">PLACE</div>
+          <div class="hero-info-value">オンライン（Zoom）</div>
+          <div class="hero-info-note">スマホ・PCどちらでも参加できます</div>
+        </div>
+      </div>'''
+rep(old_panel, new_panel, label='hero info panel')
+
+# (2) ヒーローCTAを中央揃えに(上のサブコピーが中央のため左寄せだと崩れて見える)
+rep('''<p class="text-center text-sm neon-lime mb-3">日程はご都合に合わせます／オンライン参加OK／これは「面接」ではありません</p><a href="#reserve" class="btn-neon btn-cta-lg" data-ga-event="cta_click" data-ga-label="hero">
+        ▶ 説明会を予約する
+      </a>''',
+'''<p class="text-center text-sm neon-lime mb-3">日程はご都合に合わせます／オンライン参加OK／これは「面接」ではありません</p>
+      <div style="text-align:center;"><a href="#reserve" class="btn-neon btn-cta-lg" data-ga-event="cta_click" data-ga-label="hero">
+        ▶ 説明会を予約する
+      </a></div>''', label='hero CTA center')
+
+# (3) ヒーロー下部のバッジ群も中央揃えに揃える
+rep('<div class="mt-6 flex flex-wrap gap-2">',
+    '<div class="mt-6 flex flex-wrap gap-2 justify-center">', label='hero badges center')
+
+# (4) 上記クラスのCSSを追加(視認性: ラベル/補足の明度とサイズを引き上げ)
+rep('  .form-optional {',
+    '''  /* ヒーロー イベント情報パネル */
+  .hero-info-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    color: var(--neon-cyan);
+    opacity: 0.85;
+    margin-bottom: 0.5rem;
+  }
+  .hero-info-value {
+    font-family: 'JetBrains Mono', 'Noto Sans JP', monospace;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.4;
+  }
+  .hero-info-value.neon-cyan { color: var(--neon-cyan); }
+  .hero-info-value-sub { font-size: 0.85em; font-weight: 500; opacity: 0.85; }
+  .hero-info-note {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: #A9B6CC;
+  }
+  @media (min-width: 640px) {
+    .hero-info-grid { gap: 0; }
+    .hero-info-col { padding: 0 1.75rem; }
+    .hero-info-col:first-child { padding-left: 0; }
+    .hero-info-col + .hero-info-col { border-left: 1px solid var(--border); }
+  }
+  .form-optional {''', label='hero panel css')
+
+# ── 修正3c: オンライン説明会 → 対面の会社見学 へ全面変更 ─────────────────
+# 開催概要テーブル(オンライン前提の項目を対面用に差し替え)
+rep('''          <tr><th>時間帯</th><td><span class="font-bold">18:00 ／ 18:30 ／ 19:00 スタート</span><span class="font-mono text-xs ml-2" style="color: var(--text-sub);">(各 約45分)</span><br><span class="font-mono text-xs" style="color: var(--text-sub);">// 好きな時間帯をお選びください</span></td></tr>
+          <tr><th>形式</th><td>オンライン（Zoom）<br><span style="color: var(--text-sub);">オンラインミーティングURLは予約確認メールでお送りします</span></td></tr>
+          <tr><th>参加方法</th><td>顔出し不要・音声のみでOK<br><span style="color: var(--text-sub);">スマホ・PC・タブレットあいずれかで参加可</span></td></tr>
+          <tr><th>こんな方も</th><td>仕事帰りの車の中からでもOK<br><span style="color: var(--text-sub);">気軽にご参加ください</span></td></tr>
+          <tr><th>服装</th><td>何でもOK（カメラOFF）</td></tr>''',
+'''          <tr><th>時間帯</th><td><span class="font-bold">平日の日中・夕方／土曜も相談可</span><span class="font-mono text-xs ml-2" style="color: var(--text-sub);">(所要 約45分)</span><br><span class="font-mono text-xs" style="color: var(--text-sub);">// ご都合の良い時間をお知らせください</span></td></tr>
+          <tr><th>形式</th><td>対面での会社見学（1対1）<br><span style="color: var(--text-sub);">実際の職場・資材・機器を、その場でご覧いただけます</span></td></tr>
+          <tr><th>場所</th><td>株式会社 松下工業 本社<br><span style="color: var(--text-sub);">富山県富山市中島3-4-20／駐車場あり・お車でお越しいただけます</span></td></tr>
+          <tr><th>持ち物</th><td>手ぶらでOK<br><span style="color: var(--text-sub);">履歴書も筆記用具も必要ありません</span></td></tr>
+          <tr><th>服装</th><td>私服でOK<br><span style="color: var(--text-sub);">スーツも作業着も必要ありません</span></td></tr>
+          <tr><th>こんな方も</th><td>ご家族・ご友人とご一緒でもOK<br><span style="color: var(--text-sub);">「まず職場を見てみたい」だけで大歓迎です</span></td></tr>''',
+    label='event table → 対面')
+
+rep('<tr><th>開催日</th><td>', '<tr><th>見学日</th><td>', label='event table 見学日')
+
+# 参加までの流れ(オンライン参加 → 来社)
+rep('''      <!-- オンライン参加案内 -->''', '''      <!-- 見学までの流れ -->''', label='howto comment')
+rep('<div class="term-label">HOW_TO_JOIN.online</div>', '<div class="term-label">HOW_TO_JOIN.visit</div>', label='howto label')
+rep('''              <div class="font-bold mb-1">オンラインミーティングURLをメールで受け取る</div>
+              <p class="text-sm" style="color: var(--text-sub);">ご予約後、担当者からオンラインミーティングURLをお送りします。</p>''',
+'''              <div class="font-bold mb-1">担当者と見学日を決める</div>
+              <p class="text-sm" style="color: var(--text-sub);">ご予約後、担当者からご連絡します。ご都合に合わせて日時を決めましょう。</p>''',
+    label='howto 02')
+rep('''              <div class="font-bold mb-1">当日、URLをタップするだけ</div>
+              <p class="text-sm" style="color: var(--text-sub);">顔出し不要。音声のみでOK。仕事帰りの車内からでも参加できます。</p>''',
+'''              <div class="font-bold mb-1">当日、本社にお越しください</div>
+              <p class="text-sm" style="color: var(--text-sub);">私服・手ぶらでOK。駐車場がありますので、お車でお越しいただけます。</p>''',
+    label='howto 03')
+
+# 当日の流れ STEP02(画面共有 → 実物を見てもらう)
+rep('会社・仕事紹介（画面共有）', '会社・職場のご案内', label='step02 title')
+rep('スライドや写真で仕事内容・社内の雰囲気をご紹介。実際に使う資材・機器も画像でお見せします。',
+    '実際の職場をご案内します。普段使っている資材や機器も、その場で手に取ってご覧いただけます。', label='step02 body')
+
+# ヒーローパネル(場所・時間)
+rep('''          <div class="hero-info-value">平日夜 18:00〜<span class="hero-info-value-sub">／日中も可</span></div>
+          <div class="hero-info-note">1対1の個別開催・約45分</div>''',
+'''          <div class="hero-info-value">平日の日中・夕方<span class="hero-info-value-sub">／土曜も相談可</span></div>
+          <div class="hero-info-note">1対1でご案内・所要 約45分</div>''', label='hero TIME 対面')
+rep('''          <div class="hero-info-value">オンライン（Zoom）</div>
+          <div class="hero-info-note">スマホ・PCどちらでも参加できます</div>''',
+'''          <div class="hero-info-value">富山市中島 3-4-20</div>
+          <div class="hero-info-note">松下工業 本社／駐車場あり・お車でお越しいただけます</div>''', label='hero PLACE 対面')
+
+# ヒーローのバッジ・サブコピー
+rep('日程はご都合に合わせます／オンライン参加OK／これは「面接」ではありません',
+    '日程はご都合に合わせます／私服・手ぶらでOK／これは「面接」ではありません', label='hero microcopy 対面')
+rep('<span class="badge badge-lime">顔出し 不要</span>', '<span class="badge badge-lime">私服 でOK</span>', label='badge 顔出し')
+rep('<span class="badge badge-lime">音声のみ OK</span>', '<span class="badge badge-lime">手ぶら でOK</span>', label='badge 音声のみ')
+rep('<span class="badge badge-lime">仕事帰り・車内から OK</span>', '<span class="badge badge-lime">家族・友人の同伴 OK</span>', label='badge 車内')
+
+# フォーム周辺
+rep('&gt; 顔出し不要・音声のみOK / 履歴書不要・日程は後から調整OK',
+    '&gt; 私服・手ぶらでOK / 履歴書不要・日程は後から調整OK', label='submit microcopy 対面')
+rep('担当者より、オンラインミーティングURLを', '担当者より、見学日時のご相談を', label='thanks 対面')
+
+# メタ情報(og:title は「会社説明会（オンライン）」表記を含むため先に処理)
+rep('<meta property="og:title" content="その仕事、AIでいいがないけ。｜株式会社松下工業 会社説明会（オンライン）"',
+    '<meta property="og:title" content="その仕事、AIでいいがないけ。｜株式会社松下工業 個別の会社見学"', label='og title 対面')
+rep('その仕事、AIでいいがないけ。｜株式会社松下工業 オンライン個別説明会（日程はご都合に合わせて調整）',
+    'その仕事、AIでいいがないけ。｜株式会社松下工業 個別の会社見学（日程はご都合に合わせて調整）', label='title 対面')
+rep('富山市のライフラインを支える配管技術者。AIに代えられない技術を、未経験から。オンライン個別説明会は日程調整制・随時受付。顔出し不要・履歴書不要・仕事帰りOK。',
+    '富山市のライフラインを支える配管技術者。AIに代えられない技術を、未経験から。1対1の会社見学を随時受付中（日程は個別調整）。私服・手ぶら・履歴書不要。',
+    label='meta desc 対面')
+rep('富山市のライフラインを支える配管技術者。AIに代えられない技術を、未経験から。オンライン個別説明会は日程調整制・随時受付。顔出し不要・仕事帰りでも参加OK。',
+    '富山市のライフラインを支える配管技術者。AIに代えられない技術を、未経験から。1対1の会社見学を随時受付中（日程は個別調整）。私服・手ぶらでOK。',
+    label='og desc 対面')
+rep('オンライン個別説明会 ／ 日程は個別調整・随時受付',
+    '1対1の会社見学 ／ 日程は個別調整・随時受付', label='hero badge 対面')
+rep('● ONLINE', '● 見学 受付中', label='hero ONLINE badge')
+
+# 呼称を「説明会」→「会社見学」に統一
+d = d.replace('説明会', '会社見学')
+assert 'オンライン会社見学' not in d and 'Zoom' not in d, 'オンライン前提の表記が残存'
+
+# ── 修正3d: 視認性の底上げ(透明性コンテンツを読ませるため) ────────────────
+# 本文色を明るく・日本語向けに行間を広げる。既存ルールを上書きするため末尾に追加。
+legibility_css = '''
+  /* ===== 視認性の改善（情報の透明性を伝えるための可読性強化） ===== */
+  :root { --text-sub: #A9B6CC; }
+  .text-sm  { line-height: 1.75rem; }
+  .text-base{ line-height: 1.9rem; }
+  .text-lg  { line-height: 2.05rem; }
+  p { line-height: 1.9; }
+  .spec-table { font-size: 1rem; }
+  .spec-table th, .spec-table td { padding: 1.05rem 1rem; line-height: 1.8; }
+  .spec-table th { color: var(--neon-cyan); font-weight: 700; }
+  .card p { color: #C2CDDD; }
+  .term-label { letter-spacing: 0.12em; }
+'''
+i_style_end = d.rindex('</style>')
+d = d[:i_style_end] + legibility_css + d[i_style_end:]
+
+# ── 修正3e: コンバージョン計測の是正 ──────────────────────────────────
+# (1) CTAクリックの擬似コンバージョンを lead_submit から分離する。
+#     旧Googleフォーム時代の名残で「ボタンを押しただけ」でCVが立っていた。
+#     実フォーム送信(handleSuccess)だけが lead_submit を発火するようにする。
+rep("""    // CTAクリック=Lead(擬似コンバージョン)として別イベントもpush
+    // ※Googleフォーム送信完了は計測できないため、ボタンクリック=Leadとして扱う
+    // ※GTM側でこのイベントを拾ってMeta Pixel Lead/GA4 generate_leadを発火させる
+    if (eventName === 'cta_click') {
+      track('lead_submit', {
+        lead_source: label || 'unknown',
+        lead_type: 'briefing_reservation_cta'
+      });
+    }""",
+"""    // CTAクリックは「意向」であって予約完了ではないため、コンバージョン(lead_submit)とは
+    // 別イベントで送る。lead_submit は予約フォームの送信成功時のみ発火する。
+    // ※GTM側では lead_submit（＝実際の予約）をコンバージョンに設定してください。
+    if (eventName === 'cta_click') {
+      track('cta_lead_intent', {
+        event_category: 'engagement',
+        lead_source: label || 'unknown',
+        lead_type: 'briefing_reservation_cta'
+      });
+    }
+
+    // LINEは他のCTAと性質が異なる(友だち追加導線)ため単独で評価できるようにする
+    if (label === 'hero_line' || label === 'floating_line') {
+      track('line_click', {
+        event_category: 'engagement',
+        event_label: label
+      });
+    }""", label='CV分離')
+
+# (2) 送信失敗時の取りこぼし防止:
+#     GASへのPOSTが失敗しても予約自体は保存されているケースがあるため、
+#     送信を試みた時点でも別イベントを残す(GTMでのCVには使わず、突合用)。
+rep("""    // 送信開始
+    submitBtn.disabled = true;""",
+"""    // 送信を試みた時点の記録(GAS側に保存されたのに通信エラーになるケースの突合用)
+    track('form_submit_attempt', {
+      event_category: 'form',
+      event_label: 'reserve_form'
+    });
+
+    // 送信開始
+    submitBtn.disabled = true;""", label='送信試行イベント')
+
+# (3) エラー文の電話番号を tel: リンク化して計測する(スマホでタップ発信できるようにする)
+rep('⚠ 送信に失敗しました。お手数ですが時間をおいて再度お試しいただくか、お電話(076-433-2040)でお問い合わせください。',
+    '⚠ 送信に失敗しました。お手数ですが時間をおいて再度お試しいただくか、'
+    '<a href="tel:0764332040" data-ga-event="call_click" data-ga-label="form_error" '
+    'style="color:var(--neon-cyan);text-decoration:underline;">076-433-2040</a> へお電話ください。',
+    label='tel リンク(エラー時)')
+
+# (4) 常時表示のLINEボタンが未計測だったため計測タグを付与する
+rep("""<a href="https://lin.ee/T719ae9" target="_blank" rel="noopener"
+   style="position:fixed;right:20px;bottom:24px;""",
+"""<a href="https://lin.ee/T719ae9" target="_blank" rel="noopener"
+   data-ga-event="cta_click" data-ga-label="floating_line"
+   style="position:fixed;right:20px;bottom:24px;""", label='floating LINE 計測')
+
+# ── 修正4: セクション並び替え + 透明性コンテンツの追加 ───────────────────
+# トップレベル(行頭)の <section>...</section> を動的に抽出する
+sec_re = re.compile(r'^<section\b.*?^</section>', re.S | re.M)
+blocks = list(sec_re.finditer(d))
+assert len(blocks) == 8, f'トップレベルsectionの検出数が想定外: {len(blocks)}'
+
+head = d[:blocks[0].start()]
+tail = d[blocks[-1].end():]
+S = [b.group(0) for b in blocks]
+
+def pick(marker):
+    hits = [x for x in S if marker in x]
+    assert len(hits) == 1, f'セクション特定失敗 [{marker}]: {len(hits)}件'
+    return hits[0]
+
+S_hero   = pick('MISSION_BRIEFING.txt')
+S_abema  = pick('ABEMA Prime出演')
+S_nointv = pick('PARTICIPATION_RULES')
+S_flow   = pick('SCHEDULE.timeline')
+S_pay    = pick('COMPENSATION.table')
+S_event  = pick('EVENT_INFO.detail')
+S_form   = pick('id="reserve"')
+S_ceo    = pick('CEO_MESSAGE.final')
+
+assert S_form.startswith('<section id="reserve"'), 'フォームセクションの切り出し失敗'
+assert '給与・待遇' in S_pay, '給与セクションの切り出し失敗'
+
+# ── 新規セクション(透明性コンテンツ) ─────────────────────────────────
+S_day = '''
+<!-- ============ 追加: 仕事の1日（働き方の透明性） ============ -->
+<section class="py-8 sm:py-28 grid-bg" style="background: var(--bg-main);">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6">
+    <div class="term-label reveal mb-4">A_DAY.timeline</div>
+    <h2 class="section-heading reveal mb-6">
+      8時に始まって、<br class="sm:hidden">
+      <span class="neon-cyan">17時に終わります。</span>
+    </h2>
+    <p class="text-base sm:text-lg mb-10 max-w-3xl" style="color: var(--text-sub);">
+      「実際、何時に帰れるのか」。ここが一番気になると思うので、先に書いておきます。
+    </p>
+
+    <div class="card reveal-scale p-6 sm:p-10 mb-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div class="flex gap-4 items-start p-4" style="background: rgba(0,229,255,0.04); border-left: 2px solid var(--neon-cyan);">
+          <div class="font-mono font-bold neon-cyan" style="min-width: 3.6rem;">8:00</div>
+          <div>
+            <div class="font-bold mb-1">出社・朝礼</div>
+            <div class="text-sm" style="color: var(--text-sub);">その日の現場と段取りを全員で確認します。</div>
+          </div>
+        </div>
+        <div class="flex gap-4 items-start p-4" style="background: rgba(0,229,255,0.04); border-left: 2px solid var(--neon-cyan);">
+          <div class="font-mono font-bold neon-cyan" style="min-width: 3.6rem;">8:30</div>
+          <div>
+            <div class="font-bold mb-1">現場へ移動</div>
+            <div class="text-sm" style="color: var(--text-sub);">富山市内が中心。<span class="neon-lime">転勤はありません。</span></div>
+          </div>
+        </div>
+        <div class="flex gap-4 items-start p-4" style="background: rgba(0,229,255,0.04); border-left: 2px solid var(--neon-cyan);">
+          <div class="font-mono font-bold neon-cyan" style="min-width: 3.6rem;">午前</div>
+          <div>
+            <div class="font-bold mb-1">配管作業</div>
+            <div class="text-sm" style="color: var(--text-sub);">上下水道・ガスの新設や修繕。だいたい4人前後のチームで動きます。</div>
+          </div>
+        </div>
+        <div class="flex gap-4 items-start p-4" style="background: rgba(0,229,255,0.04); border-left: 2px solid var(--neon-cyan);">
+          <div class="font-mono font-bold neon-cyan" style="min-width: 3.6rem;">12:00</div>
+          <div>
+            <div class="font-bold mb-1">昼休憩</div>
+            <div class="text-sm" style="color: var(--text-sub);">休憩は1日あわせて90分。実働は7.5時間です。</div>
+          </div>
+        </div>
+        <div class="flex gap-4 items-start p-4" style="background: rgba(0,229,255,0.04); border-left: 2px solid var(--neon-cyan);">
+          <div class="font-mono font-bold neon-cyan" style="min-width: 3.6rem;">15:00</div>
+          <div>
+            <div class="font-bold mb-1">仕上げ・片付け</div>
+            <div class="text-sm" style="color: var(--text-sub);">「暗くなる前に終える」を全員で意識しています。</div>
+          </div>
+        </div>
+        <div class="flex gap-4 items-start p-4" style="background: rgba(180,255,0,0.06); border-left: 2px solid var(--neon-lime);">
+          <div class="font-mono font-bold neon-lime" style="min-width: 3.6rem;">17:00</div>
+          <div>
+            <div class="font-bold mb-1 neon-lime">退社</div>
+            <div class="text-sm" style="color: var(--text-sub);">社長も部長も定時で帰ります。だから「帰りにくい空気」がありません。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card reveal-scale p-6 sm:p-8">
+      <div class="term-label reveal mb-4">HOLIDAYS</div>
+      <p class="text-base mb-3"><span class="font-bold neon-cyan">休日：</span>日曜・第2/4/5土曜・祝日／夏季・年末年始・GW・有給・慶弔休暇</p>
+      <p class="text-sm" style="color: var(--text-sub);">
+        ※ 第1・第3土曜日は出勤日です。ここは隠さずお伝えしておきます。
+      </p>
+    </div>
+  </div>
+</section>
+'''
+
+S_growth = '''
+<!-- ============ 追加: 未経験からの成長ステップ（業務内容の透明性） ============ -->
+<section class="py-8 sm:py-28" style="background: linear-gradient(180deg, var(--bg-main) 0%, var(--bg-second) 100%);">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6">
+    <div class="term-label reveal mb-4">CAREER.steps</div>
+    <h2 class="section-heading reveal mb-6">
+      未経験は、<br class="sm:hidden">
+      <span class="neon-lime">穴掘りから始まります。</span>
+    </h2>
+    <p class="text-base sm:text-lg mb-10 max-w-3xl" style="color: var(--text-sub);">
+      かっこよく書くこともできますが、本当のところを書きます。最初は穴を掘るところからです。そこから、こう育っていきます。
+    </p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div class="card reveal-scale p-6">
+        <div class="font-mono text-xs neon-cyan mb-2">STEP 01 ／ 入社〜数ヶ月</div>
+        <div class="font-bold text-lg mb-2">穴掘り・資材運びから</div>
+        <p class="text-sm" style="color: var(--text-sub);">先輩について回りながら、現場の流れと道具の名前を覚えます。いきなり一人にはしません。</p>
+      </div>
+      <div class="card reveal-scale p-6">
+        <div class="font-mono text-xs neon-cyan mb-2">STEP 02 ／ 半年〜1年</div>
+        <div class="font-bold text-lg mb-2">簡単な配管作業を任される</div>
+        <p class="text-sm" style="color: var(--text-sub);">同時に資格の勉強もスタート。受験料・交通費・宿泊費は<span class="neon-lime">全額会社負担</span>、試験日も出勤扱いです。</p>
+      </div>
+      <div class="card reveal-scale p-6">
+        <div class="font-mono text-xs neon-cyan mb-2">STEP 03 ／ 2〜3年</div>
+        <div class="font-bold text-lg mb-2">一通りの現場を回せるように</div>
+        <p class="text-sm" style="color: var(--text-sub);">3年ほどで、ひととおりの現場を任せてもらえるようになります。ここまで来れば「手に職」です。</p>
+      </div>
+      <div class="card reveal-scale p-6">
+        <div class="font-mono text-xs neon-cyan mb-2">STEP 04 ／ 5年〜</div>
+        <div class="font-bold text-lg mb-2">専門を持ち、教える側へ</div>
+        <p class="text-sm" style="color: var(--text-sub);">上水・ガス・下水のいずれかに特化していきます。社員一人あたりの保有資格は平均11点以上です。</p>
+      </div>
+    </div>
+  </div>
+</section>
+'''
+
+S_people = '''
+<!-- ============ 追加: 働く人（共感） ============ -->
+<section class="py-8 sm:py-28 grid-bg" style="background: var(--bg-main);">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6">
+    <div class="term-label reveal mb-4">PEOPLE.voice</div>
+    <h2 class="section-heading reveal mb-6">
+      どんな人が、<br class="sm:hidden">
+      <span class="neon-cyan">働いているか。</span>
+    </h2>
+    <p class="text-base sm:text-lg mb-10 max-w-3xl" style="color: var(--text-sub);">
+      実際に働いている社員に聞いた話を、そのまま載せます。
+    </p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+      <div class="card reveal-scale p-6 sm:p-8">
+        <div class="font-mono text-xs neon-cyan mb-3">VOICE 01 ／ 営業業務部・勤続約20年</div>
+        <p class="text-base sm:text-lg font-bold mb-3" style="line-height:1.8;">
+          「前の職場は残業が月100時間を超えても、給料は今と同じくらいでした。<span class="neon-lime">今は基本17時に帰れる。</span>それが決め手でした。」
+        </p>
+        <p class="text-sm" style="color: var(--text-sub);">
+          担当は水道の本管・給水管。新築なら1日で終わる工事もあります。屋外の力仕事なので体力は要りますが、その分やったことが形に残ります。
+        </p>
+      </div>
+      <div class="card reveal-scale p-6 sm:p-8">
+        <div class="font-mono text-xs neon-cyan mb-3">VOICE 02 ／ 配管歴16年・管理担当</div>
+        <p class="text-base sm:text-lg font-bold mb-3" style="line-height:1.8;">
+          「未経験でも大丈夫です。<span class="neon-lime">最初は先輩について回って覚えます。</span>3年もあれば、一通りの現場は回れるようになります。」
+        </p>
+        <p class="text-sm" style="color: var(--text-sub);">
+          配管ルートをきれいに通す、汚れを残さない、手戻りをさせない。地味ですが、そこが信頼につながります。パズルを解くような面白さがあります。
+        </p>
+      </div>
+    </div>
+
+    <div class="card reveal-scale p-6 sm:p-8">
+      <div class="term-label reveal mb-4">ATMOSPHERE</div>
+      <p class="text-base" style="line-height:1.9;">
+        職場は基本「さん付け」。年上の先輩を「〜ちゃん」と呼んでも許されるくらいの距離感です。<br>
+        <span class="neon-lime font-bold">怒鳴る親方はいません。</span>新しい工具や工法も、若手の提案で取り入れています。
+      </p>
+    </div>
+  </div>
+</section>
+'''
+
+S_honest = '''
+<!-- ============ 追加: 両面開示（大変な点＋会社の対応） ============ -->
+<section class="py-8 sm:py-28" style="background: linear-gradient(180deg, var(--bg-main) 0%, var(--bg-third) 100%);">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6">
+    <div class="term-label reveal mb-4">HONEST.md</div>
+    <h2 class="section-heading reveal mb-6">
+      正直に言うと、<br class="sm:hidden">
+      <span style="color: var(--text-sub); font-size: 0.8em;">大変なこともあります。</span>
+    </h2>
+    <p class="text-base sm:text-lg mb-10 max-w-3xl" style="color: var(--text-sub);">
+      良いところだけ並べても、入ってから「話が違う」となるだけです。大変な点と、それに対して会社がやっていることをセットで書きます。
+    </p>
+
+    <div class="space-y-5">
+      <div class="card reveal-scale p-6 sm:p-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <div class="font-mono text-xs mb-2" style="color: #FF6B6B;">▲ 大変な点</div>
+            <div class="font-bold text-lg">屋外の仕事です。夏は暑く、冬は寒い。</div>
+            <p class="text-sm mt-2" style="color: var(--text-sub);">体力は必要です。ここは、ごまかしようがありません。</p>
+          </div>
+          <div style="border-left: 2px solid var(--neon-lime); padding-left: 1.2rem;">
+            <div class="font-mono text-xs mb-2 neon-lime">✓ 会社がやっていること</div>
+            <p class="text-sm" style="color: var(--text-sub);">制服・安全防具は貸与。「怪我なく帰る」「暗くなる前に終える」を全員で徹底しています。だから残業も基本ありません。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card reveal-scale p-6 sm:p-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <div class="font-mono text-xs mb-2" style="color: #FF6B6B;">▲ 大変な点</div>
+            <div class="font-bold text-lg">入って最初は、穴掘りが中心です。</div>
+            <p class="text-sm mt-2" style="color: var(--text-sub);">地味な作業が数ヶ月は続きます。派手さはありません。</p>
+          </div>
+          <div style="border-left: 2px solid var(--neon-lime); padding-left: 1.2rem;">
+            <div class="font-mono text-xs mb-2 neon-lime">✓ 会社がやっていること</div>
+            <p class="text-sm" style="color: var(--text-sub);">いきなり一人にはしません。熟練者に同行しながら覚えてもらいます。研修期間中も給与は保証します。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card reveal-scale p-6 sm:p-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <div class="font-mono text-xs mb-2" style="color: #FF6B6B;">▲ 大変な点</div>
+            <div class="font-bold text-lg">第1・第3土曜日は出勤です。</div>
+            <p class="text-sm mt-2" style="color: var(--text-sub);">完全週休2日ではありません。</p>
+          </div>
+          <div style="border-left: 2px solid var(--neon-lime); padding-left: 1.2rem;">
+            <div class="font-mono text-xs mb-2 neon-lime">✓ 会社がやっていること</div>
+            <p class="text-sm" style="color: var(--text-sub);">その分、平日は基本17時退社。日曜・第2/4/5土曜・祝日はしっかり休みです。夏季・年末年始・GWもあります。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="text-base sm:text-lg mt-10 text-center" style="color: var(--text-main);">
+      ここまで読んで「思ったよりキツくないな」と感じた方も、「やっぱり大変そう」と感じた方も、<br class="hidden sm:block">
+      <span class="neon-lime font-bold">まずは会社見学で、直接聞いてください。</span>
+    </p>
+    <div class="text-center mt-6">
+      <a href="#reserve" class="btn-neon btn-cta-lg" data-ga-event="cta_click" data-ga-label="after_honest">▶ 会社見学を予約する</a>
+    </div>
+  </div>
+</section>
+'''
+
+# 新しい並び: hero → ABEMA → 面接じゃない → 給与 → 【フォーム】 → 1日 → 成長 → 人 → 正直 → 当日の流れ → 開催概要 → 社長 → footer
+body = '\n'.join([
+    # ① 会社見学の案内 ─ まずは見学予約へ誘導する
+    S_hero,      # AIに代えられるか + 見学の概要 + CTA
+    S_nointv,    # これは「面接」じゃありません(参加ハードルを下げる)
+    S_flow,      # 当日の流れ(見学で何をするか)
+    S_event,     # 開催概要(日時・場所・持ち物・服装)
+    S_form,      # 予約フォーム ← 見学ブロックの締め
+    # ② 求職者にとってのメリット
+    S_pay,       # 給与・待遇(数字で全部出す)
+    S_day,       # 仕事の1日(17時退社の実態)
+    S_growth,    # 未経験からの成長ステップ
+    S_honest,    # 正直に言うと、大変なこと(両面開示)+CTA
+    S_people,    # 働く人・社員の声
+    # ③ 会社について
+    S_abema,     # ABEMA出演(メディア実績)
+    S_ceo,       # 社長メッセージ + X
+])
+d = head + '\n' + body + '\n' + tail
+
+# ── 修正4b: 並び替えでズレたセクション背景を連続させる ─────────────────────
+# 各セクションの終了色と次セクションの開始色を一致させ、境界の段差をなくす
+# (ヒーローは終端が --bg-main なので、そこから main↔second を交互に繋ぐ。
+#  末尾はフッターの --bg-second に接続する)
+sec_iter = list(re.finditer(r'^<section\b[^>]*>', d, re.M))
+chain = ['var(--bg-main)', 'var(--bg-second)']
+out, prev_end, idx = [], 0, 0
+for m in sec_iter[1:]:                      # ヒーロー(先頭)は既存のままにする
+    tag = m.group(0)
+    if 'style="background:' not in tag:
+        continue
+    start = chain[idx % 2]
+    end   = chain[(idx + 1) % 2]
+    new_tag = re.sub(r'background:[^;"]*;?',
+                     f'background: linear-gradient(180deg, {start} 0%, {end} 100%);',
+                     tag, count=1)
+    out.append(d[prev_end:m.start()]); out.append(new_tag)
+    prev_end = m.end(); idx += 1
+out.append(d[prev_end:])
+d = ''.join(out)
+print(f'背景を連続化したセクション: {idx}個 / 末尾の色: {chain[idx % 2]}')
+
+
+# ── 検証 ────────────────────────────────────────────────────────────
+assert d.count('id="reserve"') == 1, '#reserve が重複/欠落'
+assert d.count('id="reserveForm"') == 1, 'フォームが重複/欠落'
+assert '\x00' not in d, 'nullバイトが残存'
+for kw in ['@keyframes fade-up', '@keyframes pulse-glow', '@keyframes spin-slow']:
+    assert kw in d, f'{kw} 未復元'
+assert '毎週木曜' not in d, '「毎週木曜」表記が残存'
+assert '7月9日（木）' not in d, '過去日程が残存'
+assert '前日17:00' not in d and '前日まで' not in d, '旧予約締切の表記が残存'
+# GA計測タグの保全チェック
+import collections
+src_labels = collections.Counter(re.findall(r'data-ga-label="([\w-]+)"', raw.replace(b'\x00', b'@').decode('utf-8')))
+out_labels = collections.Counter(re.findall(r'data-ga-label="([\w-]+)"', d))
+missing = src_labels - out_labels
+assert not missing, f'GAラベルが失われた: {missing}'
+print('GAラベル 元:', sum(src_labels.values()), '→ 新:', sum(out_labels.values()), '(追加:', sum((out_labels - src_labels).values()), ')')
+
+OUT.write_text(d, encoding='utf-8')
+print('出力:', OUT, len(d.encode('utf-8')), 'bytes')
